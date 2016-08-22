@@ -72,9 +72,9 @@ Next install the [Boost](http://www.boost.org) (minimum 1.55.0 for GCC or 1.54.0
 ```sh
 $ sudo apt-get install libboost-all-dev
 ```
-Next download the [install script](https://github.com/libbitcoin/libbitcoin-server/blob/version2/install.sh) and enable execution:
+Next download the [install script](https://github.com/bitprim/libbitcoin-server/blob/version2/install.sh) and enable execution:
 ```sh
-$ wget https://raw.githubusercontent.com/libbitcoin/libbitcoin-server/version2/install.sh
+$ wget https://raw.githubusercontent.com/bitprim/libbitcoin-server/version2/install.sh
 $ chmod +x install.sh
 ```
 Finally install Libbitcoin Server:
@@ -119,9 +119,9 @@ Next install the [Boost](http://www.boost.org) (1.54.0 or newer) development pac
 ```sh
 $ brew install boost
 ```
-Next download the [install script](https://github.com/libbitcoin/libbitcoin-server/blob/version2/install.sh) and enable execution:
+Next download the [install script](https://github.com/bitprim/libbitcoin-server/blob/version2/install.sh) and enable execution:
 ```sh
-$ wget https://raw.githubusercontent.com/libbitcoin/libbitcoin-server/version2/install.sh
+$ wget https://raw.githubusercontent.com/bitprim/libbitcoin-server/version2/install.sh
 $ chmod +x install.sh
 ```
 Finally install Libbitcoin Server:
@@ -142,9 +142,9 @@ Next install the [Boost](http://www.boost.org) (1.54.0 or newer) development pac
 ```sh
 $ sudo port install boost -no_single -no_static -python27
 ```
-Next download the [install script](https://github.com/libbitcoin/libbitcoin-server/blob/version2/install.sh) and enable execution:
+Next download the [install script](https://github.com/bitprim/libbitcoin-server/blob/version2/install.sh) and enable execution:
 ```sh
-$ wget https://raw.githubusercontent.com/libbitcoin/libbitcoin-server/version2/install.sh
+$ wget https://raw.githubusercontent.com/bitprim/libbitcoin-server/version2/install.sh
 $ chmod +x install.sh
 ```
 Finally install Libbitcoin Server:
