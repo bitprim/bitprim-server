@@ -12,7 +12,7 @@
 
 **License Overview**
 
-All files in this repository fall under the license specified in [COPYING](https://github.com/libbitcoin/libbitcoin-server/blob/version2/COPYING). The project is licensed as [AGPL with a lesser clause](https://wiki.unsystem.net/en/index.php/Libbitcoin/License). It may be used within a proprietary project, but the core library and any changes to it must be published on-line. Source code for this library must always remain free for everybody to access.
+All files in this repository fall under the license specified in [COPYING](https://github.com/libbitcoin/libbitcoin-server/blob/improvements/COPYING). The project is licensed as [AGPL with a lesser clause](https://wiki.unsystem.net/en/index.php/Libbitcoin/License). It may be used within a proprietary project, but the core library and any changes to it must be published on-line. Source code for this library must always remain free for everybody to access.
 
 **About Libbitcoin**
 
@@ -72,9 +72,9 @@ Next install the [Boost](http://www.boost.org) (minimum 1.55.0 for GCC or 1.54.0
 ```sh
 $ sudo apt-get install libboost-all-dev
 ```
-Next download the [install script](https://github.com/bitprim/libbitcoin-server/blob/version2/install.sh) and enable execution:
+Next download the [install script](https://github.com/bitprim/libbitcoin-server/blob/improvements/install.sh) and enable execution:
 ```sh
-$ wget https://raw.githubusercontent.com/bitprim/libbitcoin-server/version2/install.sh
+$ wget https://raw.githubusercontent.com/bitprim/libbitcoin-server/improvements/install.sh
 $ chmod +x install.sh
 ```
 Finally install Libbitcoin Server:
@@ -119,9 +119,9 @@ Next install the [Boost](http://www.boost.org) (1.54.0 or newer) development pac
 ```sh
 $ brew install boost
 ```
-Next download the [install script](https://github.com/bitprim/libbitcoin-server/blob/version2/install.sh) and enable execution:
+Next download the [install script](https://github.com/bitprim/libbitcoin-server/blob/improvements/install.sh) and enable execution:
 ```sh
-$ wget https://raw.githubusercontent.com/bitprim/libbitcoin-server/version2/install.sh
+$ wget https://raw.githubusercontent.com/bitprim/libbitcoin-server/improvements/install.sh
 $ chmod +x install.sh
 ```
 Finally install Libbitcoin Server:
@@ -142,9 +142,9 @@ Next install the [Boost](http://www.boost.org) (1.54.0 or newer) development pac
 ```sh
 $ sudo port install boost -no_single -no_static -python27
 ```
-Next download the [install script](https://github.com/bitprim/libbitcoin-server/blob/version2/install.sh) and enable execution:
+Next download the [install script](https://github.com/bitprim/libbitcoin-server/blob/improvements/install.sh) and enable execution:
 ```sh
-$ wget https://raw.githubusercontent.com/bitprim/libbitcoin-server/version2/install.sh
+$ wget https://raw.githubusercontent.com/bitprim/libbitcoin-server/improvements/install.sh
 $ chmod +x install.sh
 ```
 Finally install Libbitcoin Server:
