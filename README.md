@@ -6,17 +6,17 @@
 
 *Bitcoin full node and query server*
 
-[Documentation](https://github.com/libbitcoin/libbitcoin-server/wiki) is available on the wiki.
+[Documentation](https://github.com/bitprim/bitprim-server/wiki) is available on the wiki.
 
-[Downloads](https://github.com/libbitcoin/libbitcoin-server/wiki/Download-BS) are available for Linux, Macintosh and Windows.
+[Downloads](https://github.com/bitprim/bitprim-server/wiki/Download-BS) are available for Linux, Macintosh and Windows.
 
 **License Overview**
 
-All files in this repository fall under the license specified in [COPYING](https://github.com/libbitcoin/libbitcoin-server/blob/version2/COPYING). The project is licensed as [AGPL with a lesser clause](https://wiki.unsystem.net/en/index.php/Libbitcoin/License). It may be used within a proprietary project, but the core library and any changes to it must be published on-line. Source code for this library must always remain free for everybody to access.
+All files in this repository fall under the license specified in [COPYING](https://github.com/bitprim/bitprim-server/blob/version2/COPYING). The project is licensed as [AGPL with a lesser clause](https://wiki.unsystem.net/en/index.php/Libbitcoin/License). It may be used within a proprietary project, but the core library and any changes to it must be published on-line. Source code for this library must always remain free for everybody to access.
 
 **About Libbitcoin**
 
-The libbitcoin toolkit is a set of cross platform C++ libraries for building bitcoin applications. The toolkit consists of several libraries, most of which depend on the foundational [libbitcoin](https://github.com/libbitcoin/libbitcoin) library. Each library's repository can be cloned and built using common [Automake](http://www.gnu.org/software/automake) instructions.
+The bitprim toolkit is a set of cross platform C++ libraries for building bitcoin applications. The toolkit consists of several libraries, most of which depend on the foundational [bitprim-core](https://github.com/bitprim/bitprim-core) library. Each library's repository can be cloned and built using common [Automake](http://www.gnu.org/software/automake) instructions.
 
 **About Libbitcoin Server**
 
@@ -24,7 +24,7 @@ A full Bitcoin peer-to-peer node, Libbitcoin Server is also a high performance b
 
 Libbitcoin Server exposes a custom query TCP API built based on the [ZeroMQ](http://zeromq.org) networking stack. It supports server, and optionally client, identity certificates and wire encryption via [CurveZMQ](http://curvezmq.org) and the [Sodium](http://libsodium.org) cryptographic library.
 
-The API is backward compatible with its predecessor [Obelisk](https://github.com/spesmilo/obelisk) and supports simple and advanced scenarios, including stealth payment queries. The [libbitcoin-client](https://github.com/libbitcoin/libbitcoin-client) library provides a calling API for building client applications. The server is complimented by [libbitcoin-explorer (BX)](https://github.com/libbitcoin/libbitcoin-explorer), the Bitcoin command line tool and successor to [SX](https://github.com/spesmilo/sx).
+The API is backward compatible with its predecessor [Obelisk](https://github.com/spesmilo/obelisk) and supports simple and advanced scenarios, including stealth payment queries. The [bitprim-client](https://github.com/bitprim/bitprim-client) library provides a calling API for building client applications. The server is complimented by [bitprim-explorer (BX)](https://github.com/bitprim/bitprim-explorer), the Bitcoin command line tool and successor to [SX](https://github.com/spesmilo/sx).
 
 ## Requirements.
 
@@ -32,7 +32,7 @@ At least 100 Gb file storage (SSD preferred), with swap enabled and at least 4Gb
 
 ## Installation
 
-Libbitcoin Server can be built from sources or downloaded as a signed portable [single file executable](https://github.com/libbitcoin/libbitcoin-server/wiki/Download-BS).
+Libbitcoin Server can be built from sources or downloaded as a signed portable [single file executable](https://github.com/bitprim/bitprim-server/wiki/Download-BS).
 
 On Linux and Macintosh Libbitcoin Server is built using Autotools as follows.
 ```sh
@@ -50,7 +50,7 @@ Detailed instructions are provided below.
 
 ### Debian/Ubuntu
 
-The install script is recommended for installation, however preliminary [version2 packages](https://github.com/libbitcoin/libbitcoin-server/wiki/Debian-Packages) are available for testing.
+The install script is recommended for installation, however preliminary [version2 packages](https://github.com/bitprim/bitprim-server/wiki/Debian-Packages) are available for testing.
 
 Libbitcoin requires a C++11 compiler, currently minimum [GCC 4.8.0](https://gcc.gnu.org/projects/cxx0x.html) or Clang based on [LLVM 3.5](http://llvm.org/releases/3.5.0/docs/ReleaseNotes.html).
 
@@ -78,9 +78,9 @@ Next install the [Boost](http://www.boost.org) (minimum 1.56.0) development pack
 ```sh
 $ sudo apt-get install libboost-all-dev
 ```
-Next download the [install script](https://github.com/libbitcoin/libbitcoin-server/blob/version2/install.sh) and enable execution:
+Next download the [install script](https://github.com/bitprim/bitprim-server/blob/version2/install.sh) and enable execution:
 ```sh
-$ wget https://raw.githubusercontent.com/libbitcoin/libbitcoin-server/version2/install.sh
+$ wget https://raw.githubusercontent.com/bitprim/bitprim-server/version2/install.sh
 $ chmod +x install.sh
 ```
 Finally install Libbitcoin Server:
@@ -125,9 +125,9 @@ Next install the [Boost](http://www.boost.org) (1.56.0 or newer) development pac
 ```sh
 $ brew install boost
 ```
-Next download the [install script](https://github.com/libbitcoin/libbitcoin-server/blob/version2/install.sh) and enable execution:
+Next download the [install script](https://github.com/bitprim/bitprim-server/blob/version2/install.sh) and enable execution:
 ```sh
-$ wget https://raw.githubusercontent.com/libbitcoin/libbitcoin-server/version2/install.sh
+$ wget https://raw.githubusercontent.com/bitprim/bitprim-server/version2/install.sh
 $ chmod +x install.sh
 ```
 Finally install Libbitcoin Server:
@@ -148,9 +148,9 @@ Next install the [Boost](http://www.boost.org) (1.56.0 or newer) development pac
 ```sh
 $ sudo port install boost -no_single -no_static -python27
 ```
-Next download the [install script](https://github.com/libbitcoin/libbitcoin-server/blob/version2/install.sh) and enable execution:
+Next download the [install script](https://github.com/bitprim/bitprim-server/blob/version2/install.sh) and enable execution:
 ```sh
-$ wget https://raw.githubusercontent.com/libbitcoin/libbitcoin-server/version2/install.sh
+$ wget https://raw.githubusercontent.com/bitprim/bitprim-server/version2/install.sh
 $ chmod +x install.sh
 ```
 Finally install Libbitcoin Server:
@@ -208,7 +208,7 @@ $ sudo ./install.sh --with-bash-completion-dir
 
 ### Windows
 
-Visual Studio solutions are maintained for all libbitcoin libraries and dependencies. The supported execution environment is `Windows XP Service Pack 2` and newer.
+Visual Studio solutions are maintained for all bitprim libraries and dependencies. The supported execution environment is `Windows XP Service Pack 2` and newer.
 
 #### Upgrade Compiler
 
@@ -219,9 +219,9 @@ Libbitcoin requires a C++11 compiler, which means **Visual Studio 2013** minimum
 
 #### Create Local NuGet Repository
 
-Dependencies apart from the libbitcoin libraries are available as [NuGet packages](https://www.nuget.org/packages?q=evoskuil). The libbitcoin solution files are configured with references to these packages.
+Dependencies apart from the bitprim libraries are available as [NuGet packages](https://www.nuget.org/packages?q=evoskuil). The bitprim solution files are configured with references to these packages.
 
-> To avoid redundancies and conflicts across libbitcoin repositories these references expect a [NuGet.config](http://docs.nuget.org/docs/release-notes/nuget-2.1) in a central location. Despite flexibility in locating NuGet.config, NuGet writes the individual package paths into project files. As such the central repository should be configured in the same relative location as indicated by these paths within the project files. See [NuGet Repository](#nuget-repository) below.
+> To avoid redundancies and conflicts across bitprim repositories these references expect a [NuGet.config](http://docs.nuget.org/docs/release-notes/nuget-2.1) in a central location. Despite flexibility in locating NuGet.config, NuGet writes the individual package paths into project files. As such the central repository should be configured in the same relative location as indicated by these paths within the project files. See [NuGet Repository](#nuget-repository) below.
 
 The required set of NuGet packages can be viewed using the [NuGet package manager](http://docs.nuget.org/docs/start-here/managing-nuget-packages-using-the-dialog) from the Libbitcoin Server solution. The NuGet package manager will automatically download missing packages, either from the build scripts or after prompting you in the Visual Studio environment. For your reference these are the required packages:
 
@@ -242,32 +242,32 @@ The required set of NuGet packages can be viewed using the [NuGet package manage
 
 #### Build Libbitcoin Projects
 
-To build Libbitcoin Server you must also download and build its **libbitcoin dependencies**, as these are not yet packaged. The builds can be performed manually (from within Visual Studio) or using the `buildall.bat` script provided in the `builds\msvc\build\` subdirectory of each repository. The scripts automatically download the required NuGet packages.
+To build Libbitcoin Server you must also download and build its **bitprim dependencies**, as these are not yet packaged. The builds can be performed manually (from within Visual Studio) or using the `buildall.bat` script provided in the `builds\msvc\build\` subdirectory of each repository. The scripts automatically download the required NuGet packages.
 
 > Tip: The `buildall.bat` scripts build *all* valid configurations. The build time can be significantly reduced by disabling all but the desired configuration in the `buildbase.bat` of each project.
 
 Build these solutions in order:
 
-1. [libbitcoin/libbitcoin](https://github.com/libbitcoin/libbitcoin)
-2. [libbitcoin/libbitcoin-consensus](https://github.com/libbitcoin/libbitcoin-consensus)
-2. [libbitcoin/libbitcoin-blockchain](https://github.com/libbitcoin/libbitcoin-blockchain)
-2. [libbitcoin/libbitcoin-node](https://github.com/libbitcoin/libbitcoin-node)
-3. [libbitcoin/libbitcoin-server](https://github.com/libbitcoin/libbitcoin-server)
+1. [bitprim/bitprim-core](https://github.com/bitprim/bitprim-core)
+2. [bitprim/bitprim-consensus](https://github.com/bitprim/bitprim-consensus)
+2. [bitprim/bitprim-blockchain](https://github.com/bitprim/bitprim-blockchain)
+2. [bitprim/bitprim-node](https://github.com/bitprim/bitprim-node)
+3. [bitprim/bitprim-server](https://github.com/bitprim/bitprim-server)
 
-> The libbitcoin dynamic (DLL) build configurations do not compile, as the exports have not yet been fully implemented. These are currently disabled in the build scripts but you will encounter numerous errors if you build then manually.
+> The bitprim dynamic (DLL) build configurations do not compile, as the exports have not yet been fully implemented. These are currently disabled in the build scripts but you will encounter numerous errors if you build then manually.
 
 Configuration options are exposed in the Visual Studio property pages.
 
 #### Optional: Build Everything
 
-The non-boost packages above are all sourced from GitHub repositories maintained using the same [Visual Studio template](https://github.com/evoskuil/visual-studio-template) as the libbitcoin libraries. If so desired each of these can be built locally, in the same manner as the libbitcoin libraries above. This allows you to avoid using the pre-built NuGet packages. The repositories for each dependency are as follows:
+The non-boost packages above are all sourced from GitHub repositories maintained using the same [Visual Studio template](https://github.com/evoskuil/visual-studio-template) as the bitprim libraries. If so desired each of these can be built locally, in the same manner as the bitprim libraries above. This allows you to avoid using the pre-built NuGet packages. The repositories for each dependency are as follows:
 
 * Cryptography
-   * [libbitcoin/secp256k1](https://github.com/libbitcoin/secp256k1)
+   * [bitprim/secp256k1](https://github.com/bitprim/secp256k1)
 * Zero Message Queue
    * [zeromq/libzmq](https://github.com/zeromq/libzmq)
 
-This change is properly accomplished by disabling the "NuGet Dependencies" in the Visual Studio properties user interface for each libbitcoin project and then importing the `.import.props` file(s) for the corresponding dependencies.
+This change is properly accomplished by disabling the "NuGet Dependencies" in the Visual Studio properties user interface for each bitprim project and then importing the `.import.props` file(s) for the corresponding dependencies.
 
 #### NuGet Repository
 NuGet packages are downloaded to a local file systems repository. By default the [NuGet Package Manager](http://visualstudiogallery.msdn.microsoft.com/27077b70-9dad-4c64-adcf-c7cf6bc9970c) uses a repository path within the solution. This can complicate source control and results in multiple repositories across solutions.
@@ -278,19 +278,19 @@ A better configuration is to centralize the NuGet repository outside of your `gi
 -me
     -git
         nuget.config
-        -libbitcoin
-        -libbitcoin-consensus
-        -libbitcoin-blockchain
-        -libbitcoin-node
-        -libbitcoin-protocol
-        -libbitcoin-server
+        -bitprim-core
+        -bitprim-consensus
+        -bitprim-blockchain
+        -bitprim-node
+        -bitprim-protocol
+        -bitprim-server
             -builds
                 -msvc
                     -vs2013
                         -bitcoin-server
                             bitcoin-server.vcxproj
                             packages.config
-                        libbitcoin-server.sln
+                        bitprim-server.sln
     -nuget
         repositories.config
         +boost.1.56.0.0
