@@ -2,7 +2,7 @@
 
 [![Coverage Status](https://coveralls.io/repos/libbitcoin/libbitcoin-server/badge.svg)](https://coveralls.io/r/libbitcoin/libbitcoin-server)
 
-# Libbitcoin Server
+# Bitprim Server
 
 *Bitcoin full node and query server*
 
@@ -14,15 +14,15 @@
 
 All files in this repository fall under the license specified in [COPYING](https://github.com/bitprim/bitprim-server/blob/version2/COPYING). The project is licensed as [AGPL with a lesser clause](https://wiki.unsystem.net/en/index.php/Libbitcoin/License). It may be used within a proprietary project, but the core library and any changes to it must be published on-line. Source code for this library must always remain free for everybody to access.
 
-**About Libbitcoin**
+**About Bitprim**
 
 The bitprim toolkit is a set of cross platform C++ libraries for building bitcoin applications. The toolkit consists of several libraries, most of which depend on the foundational [bitprim-core](https://github.com/bitprim/bitprim-core) library. Each library's repository can be cloned and built using common [Automake](http://www.gnu.org/software/automake) instructions.
 
-**About Libbitcoin Server**
+**About Bitprim Server**
 
-A full Bitcoin peer-to-peer node, Libbitcoin Server is also a high performance blockchain query server. It can be built as a single portable executable for Linux, OSX or Windows and is available for download as a signed single executable for each. It is trivial to deploy, just run the single process and allow it about two days to synchronize the Bitcoin blockchain.
+A full Bitcoin peer-to-peer node, Bitprim Server is also a high performance blockchain query server. It can be built as a single portable executable for Linux, OSX or Windows and is available for download as a signed single executable for each. It is trivial to deploy, just run the single process and allow it about two days to synchronize the Bitcoin blockchain.
 
-Libbitcoin Server exposes a custom query TCP API built based on the [ZeroMQ](http://zeromq.org) networking stack. It supports server, and optionally client, identity certificates and wire encryption via [CurveZMQ](http://curvezmq.org) and the [Sodium](http://libsodium.org) cryptographic library.
+Bitprim Server exposes a custom query TCP API built based on the [ZeroMQ](http://zeromq.org) networking stack. It supports server, and optionally client, identity certificates and wire encryption via [CurveZMQ](http://curvezmq.org) and the [Sodium](http://libsodium.org) cryptographic library.
 
 The API is backward compatible with its predecessor [Obelisk](https://github.com/spesmilo/obelisk) and supports simple and advanced scenarios, including stealth payment queries. The [bitprim-client](https://github.com/bitprim/bitprim-client) library provides a calling API for building client applications. The server is complimented by [bitprim-explorer (BX)](https://github.com/bitprim/bitprim-explorer), the Bitcoin command line tool and successor to [SX](https://github.com/spesmilo/sx).
 
@@ -32,9 +32,9 @@ At least 100 Gb file storage (SSD preferred), with swap enabled and at least 4Gb
 
 ## Installation
 
-Libbitcoin Server can be built from sources or downloaded as a signed portable [single file executable](https://github.com/bitprim/bitprim-server/wiki/Download-BS).
+Bitprim Server can be built from sources or downloaded as a signed portable [single file executable](https://github.com/bitprim/bitprim-server/wiki/Download-BS).
 
-On Linux and Macintosh Libbitcoin Server is built using Autotools as follows.
+On Linux and Macintosh Bitprim Server is built using Autotools as follows.
 ```sh
 $ ./autogen.sh
 $ ./configure
@@ -52,7 +52,7 @@ Detailed instructions are provided below.
 
 The install script is recommended for installation, however preliminary [version2 packages](https://github.com/bitprim/bitprim-server/wiki/Debian-Packages) are available for testing.
 
-Libbitcoin requires a C++11 compiler, currently minimum [GCC 4.8.0](https://gcc.gnu.org/projects/cxx0x.html) or Clang based on [LLVM 3.5](http://llvm.org/releases/3.5.0/docs/ReleaseNotes.html).
+Bitprim requires a C++11 compiler, currently minimum [GCC 4.8.0](https://gcc.gnu.org/projects/cxx0x.html) or Clang based on [LLVM 3.5](http://llvm.org/releases/3.5.0/docs/ReleaseNotes.html).
 
 To see your GCC version:
 ```sh
@@ -83,17 +83,17 @@ Next download the [install script](https://github.com/bitprim/bitprim-server/blo
 $ wget https://raw.githubusercontent.com/bitprim/bitprim-server/version2/install.sh
 $ chmod +x install.sh
 ```
-Finally install Libbitcoin Server:
+Finally install Bitprim Server:
 ```sh
 $ sudo ./install.sh
 ```
-Libbitcoin Server is now installed in `/usr/local/bin` and can be invoked as `$ bs`.
+Bitprim Server is now installed in `/usr/local/bin` and can be invoked as `$ bs`.
 
 ### Macintosh
 
-The OSX installation differs from Linux in the installation of the compiler and packaged dependencies. Libbitcoin Server supports both [Homebrew](http://brew.sh) and [MacPorts](https://www.macports.org) package managers. Both require Apple's [Xcode](https://developer.apple.com/xcode) command line tools. Neither requires Xcode as the tools may be installed independently.
+The OSX installation differs from Linux in the installation of the compiler and packaged dependencies. Bitprim Server supports both [Homebrew](http://brew.sh) and [MacPorts](https://www.macports.org) package managers. Both require Apple's [Xcode](https://developer.apple.com/xcode) command line tools. Neither requires Xcode as the tools may be installed independently.
 
-Libbitcoin Server compiles with Clang on OSX and requires C++11 support. Installation has been verified using Clang based on [LLVM 3.5](http://llvm.org/releases/3.5.0/docs/ReleaseNotes.html). This version or newer should be installed as part of the Xcode command line tools.
+Bitprim Server compiles with Clang on OSX and requires C++11 support. Installation has been verified using Clang based on [LLVM 3.5](http://llvm.org/releases/3.5.0/docs/ReleaseNotes.html). This version or newer should be installed as part of the Xcode command line tools.
 
 To see your Clang/LLVM  version:
 ```sh
@@ -130,11 +130,11 @@ Next download the [install script](https://github.com/bitprim/bitprim-server/blo
 $ wget https://raw.githubusercontent.com/bitprim/bitprim-server/version2/install.sh
 $ chmod +x install.sh
 ```
-Finally install Libbitcoin Server:
+Finally install Bitprim Server:
 ```sh
 $ ./install.sh
 ```
-Libbitcoin Server is now installed in `/usr/local/bin` and can be invoked as `$ bs`.
+Bitprim Server is now installed in `/usr/local/bin` and can be invoked as `$ bs`.
 
 #### Using MacPorts
 
@@ -153,11 +153,11 @@ Next download the [install script](https://github.com/bitprim/bitprim-server/blo
 $ wget https://raw.githubusercontent.com/bitprim/bitprim-server/version2/install.sh
 $ chmod +x install.sh
 ```
-Finally install Libbitcoin Server:
+Finally install Bitprim Server:
 ```sh
 $ ./install.sh
 ```
-Libbitcoin Server is now installed in `/usr/local/bin` and can be invoked as `$ bs`.
+Bitprim Server is now installed in `/usr/local/bin` and can be invoked as `$ bs`.
 
 ### Configuration Options
 
@@ -212,7 +212,7 @@ Visual Studio solutions are maintained for all bitprim libraries and dependencie
 
 #### Upgrade Compiler
 
-Libbitcoin requires a C++11 compiler, which means **Visual Studio 2013** minimum. Additionally a pre-release compiler must be installed as an update to Visual Studio. Download and install the following tools as necessary. Both are available free of charge:
+Bitprim requires a C++11 compiler, which means **Visual Studio 2013** minimum. Additionally a pre-release compiler must be installed as an update to Visual Studio. Download and install the following tools as necessary. Both are available free of charge:
 
 * [Visual Studio 2013 Express](http://www.visualstudio.com/en-us/products/visual-studio-express-vs.aspx)
 * [November 2013 CTP Compiler](http://www.microsoft.com/en-us/download/details.aspx?id=41151)
@@ -223,7 +223,7 @@ Dependencies apart from the bitprim libraries are available as [NuGet packages](
 
 > To avoid redundancies and conflicts across bitprim repositories these references expect a [NuGet.config](http://docs.nuget.org/docs/release-notes/nuget-2.1) in a central location. Despite flexibility in locating NuGet.config, NuGet writes the individual package paths into project files. As such the central repository should be configured in the same relative location as indicated by these paths within the project files. See [NuGet Repository](#nuget-repository) below.
 
-The required set of NuGet packages can be viewed using the [NuGet package manager](http://docs.nuget.org/docs/start-here/managing-nuget-packages-using-the-dialog) from the Libbitcoin Server solution. The NuGet package manager will automatically download missing packages, either from the build scripts or after prompting you in the Visual Studio environment. For your reference these are the required packages:
+The required set of NuGet packages can be viewed using the [NuGet package manager](http://docs.nuget.org/docs/start-here/managing-nuget-packages-using-the-dialog) from the Bitprim Server solution. The NuGet package manager will automatically download missing packages, either from the build scripts or after prompting you in the Visual Studio environment. For your reference these are the required packages:
 
 * Packages maintained by [sergey.shandar](http://www.nuget.org/profiles/sergey.shandar)
    * [boost](http://www.nuget.org/packages/boost)
@@ -240,9 +240,9 @@ The required set of NuGet packages can be viewed using the [NuGet package manage
    * [libzmq\_vc120](http://www.nuget.org/packages/libzmq_vc120)
    * [secp256k1\_vc120](http://www.nuget.org/packages/secp256k1_vc120)
 
-#### Build Libbitcoin Projects
+#### Build Bitprim Projects
 
-To build Libbitcoin Server you must also download and build its **bitprim dependencies**, as these are not yet packaged. The builds can be performed manually (from within Visual Studio) or using the `buildall.bat` script provided in the `builds\msvc\build\` subdirectory of each repository. The scripts automatically download the required NuGet packages.
+To build Bitprim Server you must also download and build its **bitprim dependencies**, as these are not yet packaged. The builds can be performed manually (from within Visual Studio) or using the `buildall.bat` script provided in the `builds\msvc\build\` subdirectory of each repository. The scripts automatically download the required NuGet packages.
 
 > Tip: The `buildall.bat` scripts build *all* valid configurations. The build time can be significantly reduced by disabling all but the desired configuration in the `buildbase.bat` of each project.
 

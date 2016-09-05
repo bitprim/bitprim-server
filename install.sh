@@ -151,7 +151,7 @@ fi
 
 # Echo generated values.
 #------------------------------------------------------------------------------
-echo "Libbitcoin installer configuration."
+echo "Bitprim installer configuration."
 echo "--------------------------------------------------------------------"
 echo "OS                    : $OS"
 echo "PARALLEL              : $PARALLEL"
@@ -579,7 +579,7 @@ build_from_tarball_boost()
     initialize_boost_configuration
     initialize_boost_icu_configuration
 
-    echo "Libbitcoin boost configuration."
+    echo "Bitprim boost configuration."
     echo "--------------------------------------------------------------------"
     echo "variant               : release"
     echo "threading             : multi"
