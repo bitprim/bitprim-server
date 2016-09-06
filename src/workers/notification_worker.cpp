@@ -515,7 +515,7 @@ void notification_worker::notify_blocks(uint32_t fork_point,
 }
 
 void notification_worker::notify_block(zmq::socket& publisher, uint32_t height,
-    const block::ptr block)
+    const chain::block::ptr block)
 {
     if (stopped())
         return;
@@ -562,7 +562,7 @@ bool notification_worker::handle_inventory(const code& ec,
 // ----------------------------------------------------------------------------
 
 bool notification_worker::handle_transaction_pool(const code& ec,
-    const point::indexes&, bc::message::transaction_message::ptr tx)
+    const chain::point::indexes&, bc::message::transaction_message::ptr tx)
 {
     if (stopped() || ec == error::service_stopped)
         return false;
