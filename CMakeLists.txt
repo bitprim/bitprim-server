@@ -1,8 +1,8 @@
 cmake_policy(VERSION 3.4)
 
-# libbitcoin-server
+# bitprim-server
 #==============================================================================
-project(libbitcoin-server
+project(bitprim-server
   VERSION 3.0.0
   LANGUAGES CXX C)
 cmake_minimum_required(VERSION 3.4)
@@ -37,16 +37,16 @@ find_package(
   Boost 1.56.0 REQUIRED
   COMPONENTS unit_test_framework)
 
-# Require bitcoin-node of at least version 3.0.0 and output ${bitcoin_node_CPPFLAGS/LIBS/PKG}.
+# Require bitprim-node of at least version 3.0.0 and output ${bitprim_node_CPPFLAGS/LIBS/PKG}.
 #------------------------------------------------------------------------------
-if (NOT TARGET libbitcoin-client)
-  find_package(libbitcoin-client 3.0.0 REQUIRED)
+if (NOT TARGET bitprim-client)
+  find_package(bitprim-client 3.0.0 REQUIRED)
 endif()
 
-# Require bitcoin-protocol of at least version 3.0.0 and output ${bitcoin_protocol_CPPFLAGS/LIBS/PKG}.
+# Require bitprim-protocol of at least version 3.0.0 and output ${bitprim_protocol_CPPFLAGS/LIBS/PKG}.
 #------------------------------------------------------------------------------
-if (NOT TARGET libbitcoin-protocol)
-  find_package(libbitcoin-protocol 3.0.0 REQUIRED)
+if (NOT TARGET bitprim-protocol)
+  find_package(bitprim-protocol 3.0.0 REQUIRED)
 endif()
 
 # Set flags.
@@ -128,14 +128,14 @@ _add_cxx_compile_flag(-fvisibility-inlines-hidden _has_visibility_inlines_hidden
 
 # Build
 #==============================================================================
-# src/libbitcoin-server.la => ${libdir}
+# src/bitprim-server.la => ${libdir}
 #------------------------------------------------------------------------------
 set(MODE STATIC)
 if (ENABLE_SHARED)
   set(MODE SHARED)
 endif()
 
-add_library(libbitcoin-server ${MODE}
+add_library(bitprim-server ${MODE}
   src/address_key.cpp
   src/configuration.cpp
   src/parser.cpp
@@ -155,24 +155,24 @@ add_library(libbitcoin-server ${MODE}
   src/utility/fetch_helpers.cpp
   src/workers/notification_worker.cpp
   src/workers/query_worker.cpp)
-target_include_directories(libbitcoin-server PUBLIC
+target_include_directories(bitprim-server PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-target_compile_definitions(libbitcoin-server PUBLIC -DBCS_STATIC)
+target_compile_definitions(bitprim-server PUBLIC -DBCS_STATIC)
 if (NOT MSVC)
-  target_compile_definitions(libbitcoin-server PUBLIC -DSYSCONFDIR=\"${SYSCONFDIR}\")
+  target_compile_definitions(bitprim-server PUBLIC -DSYSCONFDIR=\"${SYSCONFDIR}\")
 endif()
 
-target_link_libraries(libbitcoin-server libbitcoin-node libbitcoin-protocol)
+target_link_libraries(bitprim-server bitprim-node bitprim-protocol)
 
 # Group sources
 file(GLOB_RECURSE headers
   RELATIVE ${CMAKE_CURRENT_LIST_DIR}
   include/*.h include/*.hpp)
-target_sources(libbitcoin-server PRIVATE "${headers}")
+target_sources(bitprim-server PRIVATE "${headers}")
 
-get_target_property(sources libbitcoin-server SOURCES)
+get_target_property(sources bitprim-server SOURCES)
 foreach (source ${sources})
   get_filename_component(group ${source} DIRECTORY)
   if (MSVC)
@@ -181,28 +181,28 @@ foreach (source ${sources})
   source_group("${group}" FILES ${source})
 endforeach()
 
-# local: test/libbitcoin_server_test
+# local: test/bitprim_server_test
 #------------------------------------------------------------------------------
 if (WITH_TESTS)
-  add_executable(libbitcoin_server_test
+  add_executable(bitprim_server_test
     test/main.cpp
     test/server.cpp
     test/stress.sh)
   if (ENABLE_SHARED)
-    target_compile_definitions(libbitcoin_server_test PRIVATE -DBOOST_TEST_DYN_LINK)
+    target_compile_definitions(bitprim_server_test PRIVATE -DBOOST_TEST_DYN_LINK)
   endif()
-  target_link_libraries(libbitcoin_server_test libbitcoin-server)
+  target_link_libraries(bitprim_server_test bitprim-server)
 
-  target_include_directories(libbitcoin_server_test SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
-  target_link_libraries(libbitcoin_server_test
+  target_include_directories(bitprim_server_test SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
+  target_link_libraries(bitprim_server_test
     ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
   enable_testing()
-  set(_libbitcoin_tests server_tests)
-  foreach (_test_name ${_libbitcoin_tests})
+  set(_bitprim_tests server_tests)
+  foreach (_test_name ${_bitprim_tests})
     add_test(
       NAME test.${_test_name}
-      COMMAND libbitcoin_server_test
+      COMMAND bitprim_server_test
         --run_test=${_test_name}
         --show_progress=no
         --detect_memory_leak=0
@@ -218,7 +218,7 @@ if (WITH_CONSOLE)
     console/executor.cpp
     console/executor.hpp
     console/main.cpp)
-  target_link_libraries(console.bs libbitcoin-server)
+  target_link_libraries(console.bs bitprim-server)
 
   set_target_properties(
     console.bs PROPERTIES
@@ -227,8 +227,8 @@ endif()
 
 # Install
 #==============================================================================
-install(TARGETS libbitcoin-server
-  EXPORT libbitcoin-server
+install(TARGETS bitprim-server
+  EXPORT bitprim-server
   ARCHIVE DESTINATION lib)
 
 if (WITH_CONSOLE)
@@ -236,7 +236,7 @@ if (WITH_CONSOLE)
     RUNTIME DESTINATION bin)
 endif()
 
-set(_libbitcoin_headers
+set(_bitprim_headers
   # include_bitcoin_HEADERS =
   bitcoin/server.hpp
   # include_bitcoin_server_HEADERS =
@@ -266,7 +266,7 @@ set(_libbitcoin_headers
   # include_bitcoin_server_workers_HEADERS =
   bitcoin/server/workers/notification_worker.hpp
   bitcoin/server/workers/query_worker.hpp)
-foreach (_header ${_libbitcoin_headers})
+foreach (_header ${_bitprim_headers})
   get_filename_component(_directory "${_header}" DIRECTORY)
   install(FILES "include/${_header}" DESTINATION "include/${_directory}")
 endforeach()
@@ -275,9 +275,9 @@ endforeach()
 #==============================================================================
 include(CMakePackageConfigHelpers)
 
-export(EXPORT libbitcoin-server
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/libbitcoin-serverTargets.cmake")
-export(PACKAGE libbitcoin-server)
+export(EXPORT bitprim-server
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/bitprim-serverTargets.cmake")
+export(PACKAGE bitprim-server)
 
 if (UNIX)
   set(_config_package_location "lib/cmake")
@@ -285,21 +285,21 @@ elseif (WIN32)
   set(_config_package_location "cmake")
 endif()
 
-install(EXPORT libbitcoin-server
-  FILE libbitcoin-serverTargets.cmake
+install(EXPORT bitprim-server
+  FILE bitprim-serverTargets.cmake
   DESTINATION ${_config_package_location})
 
-configure_file(libbitcoin-serverConfig.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/libbitcoin-serverConfig.cmake"
+configure_file(bitprim-serverConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/bitprim-serverConfig.cmake"
   @ONLY)
 
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/libbitcoin-serverConfigVersion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/bitprim-serverConfigVersion.cmake"
   VERSION ${PROJECT_VERSION}
   COMPATIBILITY AnyNewerVersion)
 
 install(
   FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/libbitcoin-serverConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/libbitcoin-serverConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/bitprim-serverConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/bitprim-serverConfigVersion.cmake"
   DESTINATION ${_config_package_location})
