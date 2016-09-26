@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.4)
 project(bitprim-server
   VERSION 3.0.0
   LANGUAGES CXX C)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Check for baseline language coverage in the compiler for the C++11 standard.
 #------------------------------------------------------------------------------
@@ -165,6 +166,8 @@ endif()
 
 target_link_libraries(bitprim-server bitprim-node bitprim-protocol)
 
+set_target_properties(bitprim-server PROPERTIES FOLDER "server")
+
 # Group sources
 file(GLOB_RECURSE headers
   RELATIVE ${CMAKE_CURRENT_LIST_DIR}
@@ -180,6 +183,8 @@ foreach (source ${sources})
   source_group("${group}" FILES ${source})
 endforeach()
 
+# Tests
+#==============================================================================
 # local: test/bitprim_server_test
 #------------------------------------------------------------------------------
 if (WITH_TESTS)
@@ -208,6 +213,8 @@ if (WITH_TESTS)
         --report_level=no
         --build_info=yes)
   endforeach()
+
+  set_target_properties(bitprim_server_test PROPERTIES FOLDER "server")
 endif()
 
 # console/bs => ${bindir}
@@ -221,6 +228,7 @@ if (WITH_CONSOLE)
 
   set_target_properties(
     console.bs PROPERTIES
+    FOLDER "server"
     OUTPUT_NAME bs)
 endif()
 
