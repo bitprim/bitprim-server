@@ -128,6 +128,27 @@ _add_cxx_compile_flag(-fvisibility-inlines-hidden _has_visibility_inlines_hidden
 
 # Build
 #==============================================================================
+function(_group_sources target sources_dir)
+  file(GLOB_RECURSE _headers
+    ${sources_dir}/include/*.h ${sources_dir}/include/*.hpp)
+  target_sources(${target} PRIVATE ${_headers})
+
+  get_target_property(sources ${target} SOURCES)
+  foreach (source ${sources})
+    get_filename_component(group ${source} ABSOLUTE)
+    get_filename_component(group ${group} DIRECTORY)
+    file(RELATIVE_PATH group "${sources_dir}" "${group}")
+    if (group)
+      if (MSVC)
+        string(REPLACE "/" "\\" group "${group}")
+      endif()
+      source_group("${group}" FILES "${source}")
+    endif()
+  endforeach()
+
+  set_target_properties(${target} PROPERTIES FOLDER "server")
+endfunction()
+
 # src/bitprim-server.la => ${libdir}
 #------------------------------------------------------------------------------
 set(MODE STATIC)
@@ -166,22 +187,7 @@ endif()
 
 target_link_libraries(bitprim-server bitprim-node bitprim-protocol)
 
-set_target_properties(bitprim-server PROPERTIES FOLDER "server")
-
-# Group sources
-file(GLOB_RECURSE headers
-  RELATIVE ${CMAKE_CURRENT_LIST_DIR}
-  include/*.h include/*.hpp)
-target_sources(bitprim-server PRIVATE "${headers}")
-
-get_target_property(sources bitprim-server SOURCES)
-foreach (source ${sources})
-  get_filename_component(group ${source} DIRECTORY)
-  if (MSVC)
-    string(REPLACE "/" "\\" group ${group})
-  endif()
-  source_group("${group}" FILES ${source})
-endforeach()
+_group_sources(bitprim-server "${CMAKE_CURRENT_LIST_DIR}")
 
 # Tests
 #==============================================================================
@@ -201,6 +207,8 @@ if (WITH_TESTS)
   target_link_libraries(bitprim_server_test
     ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
+  _group_sources(bitprim_server_test "${CMAKE_CURRENT_LIST_DIR}/test")
+
   enable_testing()
   set(_bitprim_tests server_tests)
   foreach (_test_name ${_bitprim_tests})
@@ -213,8 +221,6 @@ if (WITH_TESTS)
         --report_level=no
         --build_info=yes)
   endforeach()
-
-  set_target_properties(bitprim_server_test PROPERTIES FOLDER "server")
 endif()
 
 # console/bs => ${bindir}
