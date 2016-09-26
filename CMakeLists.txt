@@ -191,6 +191,29 @@ _group_sources(bitprim-server "${CMAKE_CURRENT_LIST_DIR}")
 
 # Tests
 #==============================================================================
+function(_add_tests target)
+  if (ENABLE_SHARED)
+    target_compile_definitions(${target} PRIVATE -DBOOST_TEST_DYN_LINK)
+  endif()
+  target_include_directories(${target} SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
+  target_link_libraries(${target} PUBLIC ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
+  foreach (_test_name ${ARGN})
+    add_test(
+      NAME test.server.${_test_name}
+      COMMAND ${target}
+        --run_test=${_test_name}
+        --show_progress=no
+        --detect_memory_leak=0
+        --report_level=no
+        --build_info=yes)
+  endforeach()
+endfunction()
+
+if (WITH_TESTS)
+  enable_testing()
+endif()
+
 # local: test/bitprim_server_test
 #------------------------------------------------------------------------------
 if (WITH_TESTS)
@@ -198,29 +221,11 @@ if (WITH_TESTS)
     test/main.cpp
     test/server.cpp
     test/stress.sh)
-  if (ENABLE_SHARED)
-    target_compile_definitions(bitprim_server_test PRIVATE -DBOOST_TEST_DYN_LINK)
-  endif()
-  target_link_libraries(bitprim_server_test bitprim-server)
-
-  target_include_directories(bitprim_server_test SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
-  target_link_libraries(bitprim_server_test
-    ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-
+  target_link_libraries(bitprim_server_test PUBLIC bitprim-server)
   _group_sources(bitprim_server_test "${CMAKE_CURRENT_LIST_DIR}/test")
 
-  enable_testing()
-  set(_bitprim_tests server_tests)
-  foreach (_test_name ${_bitprim_tests})
-    add_test(
-      NAME test.${_test_name}
-      COMMAND bitprim_server_test
-        --run_test=${_test_name}
-        --show_progress=no
-        --detect_memory_leak=0
-        --report_level=no
-        --build_info=yes)
-  endforeach()
+  _add_tests(bitprim_server_test
+    server_tests)
 endif()
 
 # console/bs => ${bindir}
