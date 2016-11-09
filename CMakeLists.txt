@@ -1,11 +1,11 @@
-cmake_policy(VERSION 3.4)
+cmake_minimum_required(VERSION 3.4)
 
 # bitprim-server
 #==============================================================================
 project(bitprim-server
   VERSION 3.0.0
   LANGUAGES CXX C)
-cmake_minimum_required(VERSION 3.4)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Check for baseline language coverage in the compiler for the C++11 standard.
 #------------------------------------------------------------------------------
@@ -128,6 +128,27 @@ _add_cxx_compile_flag(-fvisibility-inlines-hidden _has_visibility_inlines_hidden
 
 # Build
 #==============================================================================
+function(_group_sources target sources_dir)
+  file(GLOB_RECURSE _headers
+    ${sources_dir}/include/*.h ${sources_dir}/include/*.hpp)
+  target_sources(${target} PRIVATE ${_headers})
+
+  get_target_property(sources ${target} SOURCES)
+  foreach (source ${sources})
+    get_filename_component(group ${source} ABSOLUTE)
+    get_filename_component(group ${group} DIRECTORY)
+    file(RELATIVE_PATH group "${sources_dir}" "${group}")
+    if (group)
+      if (MSVC)
+        string(REPLACE "/" "\\" group "${group}")
+      endif()
+      source_group("${group}" FILES "${source}")
+    endif()
+  endforeach()
+
+  set_target_properties(${target} PROPERTIES FOLDER "server")
+endfunction()
+
 # src/bitprim-server.la => ${libdir}
 #------------------------------------------------------------------------------
 set(MODE STATIC)
@@ -166,20 +187,32 @@ endif()
 
 target_link_libraries(bitprim-server bitprim-node bitprim-protocol)
 
-# Group sources
-file(GLOB_RECURSE headers
-  RELATIVE ${CMAKE_CURRENT_LIST_DIR}
-  include/*.h include/*.hpp)
-target_sources(bitprim-server PRIVATE "${headers}")
+_group_sources(bitprim-server "${CMAKE_CURRENT_LIST_DIR}")
 
-get_target_property(sources bitprim-server SOURCES)
-foreach (source ${sources})
-  get_filename_component(group ${source} DIRECTORY)
-  if (MSVC)
-    string(REPLACE "/" "\\" group ${group})
+# Tests
+#==============================================================================
+function(_add_tests target)
+  if (ENABLE_SHARED)
+    target_compile_definitions(${target} PRIVATE -DBOOST_TEST_DYN_LINK)
   endif()
-  source_group("${group}" FILES ${source})
-endforeach()
+  target_include_directories(${target} SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
+  target_link_libraries(${target} PUBLIC ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
+  foreach (_test_name ${ARGN})
+    add_test(
+      NAME test.server.${_test_name}
+      COMMAND ${target}
+        --run_test=${_test_name}
+        --show_progress=no
+        --detect_memory_leak=0
+        --report_level=no
+        --build_info=yes)
+  endforeach()
+endfunction()
+
+if (WITH_TESTS)
+  enable_testing()
+endif()
 
 # local: test/bitprim_server_test
 #------------------------------------------------------------------------------
@@ -188,27 +221,11 @@ if (WITH_TESTS)
     test/main.cpp
     test/server.cpp
     test/stress.sh)
-  if (ENABLE_SHARED)
-    target_compile_definitions(bitprim_server_test PRIVATE -DBOOST_TEST_DYN_LINK)
-  endif()
-  target_link_libraries(bitprim_server_test bitprim-server)
+  target_link_libraries(bitprim_server_test PUBLIC bitprim-server)
+  _group_sources(bitprim_server_test "${CMAKE_CURRENT_LIST_DIR}/test")
 
-  target_include_directories(bitprim_server_test SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
-  target_link_libraries(bitprim_server_test
-    ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-
-  enable_testing()
-  set(_bitprim_tests server_tests)
-  foreach (_test_name ${_bitprim_tests})
-    add_test(
-      NAME test.${_test_name}
-      COMMAND bitprim_server_test
-        --run_test=${_test_name}
-        --show_progress=no
-        --detect_memory_leak=0
-        --report_level=no
-        --build_info=yes)
-  endforeach()
+  _add_tests(bitprim_server_test
+    server_tests)
 endif()
 
 # console/bs => ${bindir}
@@ -222,6 +239,7 @@ if (WITH_CONSOLE)
 
   set_target_properties(
     console.bs PROPERTIES
+    FOLDER "server"
     OUTPUT_NAME bs)
 endif()
 
