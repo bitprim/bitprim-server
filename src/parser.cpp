@@ -47,7 +47,7 @@ parser::parser(const configuration& defaults)
 }
 
 // Initialize configuration using defaults of the given context.
-parser::parser(const bc::settings& context)
+parser::parser(const bc::config::settings& context)
   : configured(context)
 {
     // A server/node allows 8 inbound connections by default.
@@ -128,11 +128,47 @@ options_metadata parser::load_settings()
 {
     options_metadata description("settings");
     description.add_options()
+    /* [log] */
+    (
+        "log.debug_file",
+        value<path>(&configured.network.debug_file),
+        "The debug log file path, defaults to 'debug.log'."
+    )
+    (
+        "log.error_file",
+        value<path>(&configured.network.error_file),
+        "The error log file path, defaults to 'error.log'."
+    )
+    (
+        "log.archive_directory",
+        value<path>(&configured.network.archive_directory),
+        "The log archive directory, defaults to 'archive'."
+    )
+    (
+        "log.rotation_size",
+        value<size_t>(&configured.network.rotation_size),
+        "The size at which a log is archived, defaults to 0 (disabled)."
+    )
+    (
+        "log.maximum_archive_size",
+        value<size_t>(&configured.network.maximum_archive_size),
+        "The maximum combined size of archived logs, defaults to 4294967296."
+    )
+    (
+        "log.minimum_free_space",
+        value<size_t>(&configured.network.minimum_free_space),
+        "The minimum free space required in the archive directory, defaults to 0."
+    )
+    (
+        "log.maximum_archive_files",
+        value<size_t>(&configured.network.maximum_archive_files),
+        "The maximum number of logs to persist, defaults to 'maximum'."
+    )
     /* [network] */
     (
         "network.threads",
         value<uint32_t>(&configured.network.threads),
-        "The minimum number of threads in the application threadpool, defaults to 50."
+        "The minimum number of threads in the network threadpool, defaults to 50."
     )
     (
         "network.protocol_maximum",
@@ -202,12 +238,12 @@ options_metadata parser::load_settings()
     (
         "network.channel_expiration_minutes",
         value<uint32_t>(&configured.network.channel_expiration_minutes),
-        "The maximum age limit for an outbound connection, defaults to 1440."
+        "The age limit for an outbound connection, defaults to 1440."
     )
     (
         "network.channel_germination_seconds",
         value<uint32_t>(&configured.network.channel_germination_seconds),
-        "The maximum time limit for obtaining seed addresses, defaults to 30."
+        "The time limit for obtaining seed addresses, defaults to 30."
     )
     (
         "network.host_pool_capacity",
@@ -223,16 +259,6 @@ options_metadata parser::load_settings()
         "network.hosts_file",
         value<path>(&configured.network.hosts_file),
         "The peer hosts cache file path, defaults to 'hosts.cache'."
-    )
-    (
-        "network.debug_file",
-        value<path>(&configured.network.debug_file),
-        "The debug log file path, defaults to 'debug.log'."
-    )
-    (
-        "network.error_file",
-        value<path>(&configured.network.error_file),
-        "The error log file path, defaults to 'error.log'."
     )
     (
         "network.self",
@@ -257,31 +283,66 @@ options_metadata parser::load_settings()
 
     /* [database] */
     (
-        "database.history_start_height",
-        value<uint32_t>(&configured.database.history_start_height),
-        "The lower limit of spend indexing, defaults to 0."
-    )
-    (
-        "database.stealth_start_height",
-        value<uint32_t>(&configured.database.stealth_start_height),
-        "The lower limit of stealth indexing, defaults to 350000."
-    )
-    (
         "database.directory",
         value<path>(&configured.database.directory),
-        "The blockchain database directory, defaults to 'mainnet'."
+        "The blockchain database directory, defaults to 'blockchain'."
+    )
+    (
+        "database.file_growth_rate",
+        value<uint16_t>(&configured.database.file_growth_rate),
+        "Full database files increase by this percentage, defaults to 50."
+    )
+    (
+        "database.index_start_height",
+        value<uint32_t>(&configured.database.index_start_height),
+        "The lower limit of address and spend indexing, defaults to 0."
+    )
+    (
+        "database.block_table_buckets",
+        value<uint32_t>(&configured.database.block_table_buckets),
+        "Block hash table size, defaults to 650000."
+    )
+    (
+        "database.transaction_table_buckets",
+        value<uint32_t>(&configured.database.transaction_table_buckets),
+        "Transaction hash table size, defaults to 110000000."
+    )
+    (
+        "database.spend_table_buckets",
+        value<uint32_t>(&configured.database.block_table_buckets),
+        "Spend hash table size, defaults to 250000000."
+    )
+    (
+        "database.history_table_buckets",
+        value<uint32_t>(&configured.database.history_table_buckets),
+        "History hash table size, defaults to 107000000."
     )
 
     /* [blockchain] */
     (
-        "blockchain.block_pool_capacity",
-        value<uint32_t>(&configured.chain.block_pool_capacity),
-        "The maximum number of orphan blocks in the pool, defaults to 50."
+        "blockchain.threads",
+        value<uint32_t>(&configured.chain.threads),
+        "The number of threads dedicated to block validation, defaults to 8."
     )
     (
-        "blockchain.transaction_pool_capacity",
-        value<uint32_t>(&configured.chain.transaction_pool_capacity),
-        "The maximum number of transactions in the pool, defaults to 2000."
+        "blockchain.priority",
+        value<bool>(&configured.chain.priority),
+        "The number of threads used for block validation, defaults to 8."
+    )
+    (
+        "blockchain.use_libconsensus",
+        value<bool>(&configured.chain.use_libconsensus),
+        "Use libconsensus for script validation if integrated, defaults to false."
+    )
+    (
+        "blockchain.use_testnet_rules",
+        value<bool>(&configured.chain.use_testnet_rules),
+        "Use testnet rules for determination of work required, defaults to false."
+    )
+    (
+        "blockchain.flush_reorganizations",
+        value<bool>(&configured.chain.flush_reorganizations),
+        "Flush each reorganization to disk, defaults to false."
     )
     (
         "blockchain.transaction_pool_consistency",
@@ -289,9 +350,14 @@ options_metadata parser::load_settings()
         "Enforce consistency between the pool and the blockchain, defaults to false."
     )
     (
-        "blockchain.use_testnet_rules",
-        value<bool>(&configured.chain.use_testnet_rules),
-        "Use testnet rules for determination of work required, defaults to false."
+        "blockchain.transaction_pool_capacity",
+        value<uint32_t>(&configured.chain.transaction_pool_capacity),
+        "The maximum number of transactions in the pool, defaults to 2000."
+    )
+    (
+        "blockchain.block_pool_capacity",
+        value<uint32_t>(&configured.chain.block_pool_capacity),
+        "The maximum number of orphan blocks in the pool, defaults to 50."
     )
     (
         "blockchain.checkpoint",
@@ -306,8 +372,8 @@ options_metadata parser::load_settings()
         "The time limit for block receipt during initial block download, defaults to 5."
     )
     (
-        "node.download_connections",
-        value<uint32_t>(&configured.node.download_connections),
+        "node.initial_connections",
+        value<uint32_t>(&configured.node.initial_connections),
         "The maximum number of connections for initial block download, defaults to 8."
     )
     (

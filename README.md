@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/libbitcoin/libbitcoin-server.svg?branch=master)](https://travis-ci.org/libbitcoin/libbitcoin-server)
+[![Build Status](https://travis-ci.org/bitprim/bitprim-server.svg?branch=master)](https://travis-ci.org/bitprim/bitprim-server)
 
-[![Coverage Status](https://coveralls.io/repos/libbitcoin/libbitcoin-server/badge.svg)](https://coveralls.io/r/libbitcoin/libbitcoin-server)
+[![Coverage Status](https://coveralls.io/repos/bitprim/bitprim-server/badge.svg)](https://coveralls.io/r/bitprim/bitprim-server)
 
 # Bitprim Server
 
@@ -12,7 +12,7 @@
 
 **License Overview**
 
-All files in this repository fall under the license specified in [COPYING](https://github.com/bitprim/bitprim-server/blob/version2/COPYING). The project is licensed as [AGPL with a lesser clause](https://wiki.unsystem.net/en/index.php/Libbitcoin/License). It may be used within a proprietary project, but the core library and any changes to it must be published on-line. Source code for this library must always remain free for everybody to access.
+All files in this repository fall under the license specified in [COPYING](https://github.com/bitprim/bitprim-server/blob/version2/COPYING). The project is licensed as [AGPL with a lesser clause](https://wiki.unsystem.net/en/index.php/Bitprim/License). It may be used within a proprietary project, but the core library and any changes to it must be published on-line. Source code for this library must always remain free for everybody to access.
 
 **About Bitprim**
 
@@ -74,7 +74,7 @@ Next install the [build system](http://wikipedia.org/wiki/GNU_build_system):
 ```sh
 $ sudo apt-get install build-essential autoconf automake libtool pkg-config
 ```
-Next install the [Boost](http://www.boost.org) (minimum 1.56.0) development package:
+Next install the [Boost](http://www.boost.org) (minimum 1.57.0) development package:
 ```sh
 $ sudo apt-get install libboost-all-dev
 ```
@@ -121,7 +121,7 @@ Next install the [build system](http://wikipedia.org/wiki/GNU_build_system) and 
 ```sh
 $ brew install autoconf automake libtool pkgconfig wget
 ```
-Next install the [Boost](http://www.boost.org) (1.56.0 or newer) development package:
+Next install the [Boost](http://www.boost.org) (1.57.0 or newer) development package:
 ```sh
 $ brew install boost
 ```
@@ -144,7 +144,7 @@ Next install the [build system](http://wikipedia.org/wiki/GNU_build_system) and 
 ```sh
 $ sudo port install autoconf automake libtool pkgconfig wget
 ```
-Next install the [Boost](http://www.boost.org) (1.56.0 or newer) development package. The `-` options remove MacPort defaults that are not Boost defaults:
+Next install the [Boost](http://www.boost.org) (1.57.0 or newer) development package. The `-` options remove MacPort defaults that are not Boost defaults:
 ```sh
 $ sudo port install boost -no_single -no_static -python27
 ```
@@ -230,6 +230,7 @@ The required set of NuGet packages can be viewed using the [NuGet package manage
    * [boost\_chrono-vc120](http://www.nuget.org/packages/boost_chrono-vc120)
    * [boost\_date\_time-vc120](http://www.nuget.org/packages/boost_date_time-vc120)
    * [boost\_filesystem-vc120](http://www.nuget.org/packages/boost_filesystem-vc120)
+   * [boost\_log-vc120](http://www.nuget.org/packages/boost_log-vc120)
    * [boost\_iostreams-vc120](http://www.nuget.org/packages/boost_iostreams-vc120)
    * [boost\_program\_options-vc120](http://www.nuget.org/packages/boost_program_options-vc120)
    * [boost\_regex-vc120](http://www.nuget.org/packages/boost_regex-vc120)
@@ -250,8 +251,11 @@ Build these solutions in order:
 
 1. [bitprim/bitprim-core](https://github.com/bitprim/bitprim-core)
 2. [bitprim/bitprim-consensus](https://github.com/bitprim/bitprim-consensus)
+2. [bitprim/bitprim-database](https://github.com/bitprim/bitprim-database)
 2. [bitprim/bitprim-blockchain](https://github.com/bitprim/bitprim-blockchain)
+2. [bitprim/bitprim-network](https://github.com/bitprim/bitprim-network)
 2. [bitprim/bitprim-node](https://github.com/bitprim/bitprim-node)
+2. [bitprim/bitprim-protocol](https://github.com/bitprim/bitprim-protocol)
 3. [bitprim/bitprim-server](https://github.com/bitprim/bitprim-server)
 
 > The bitprim dynamic (DLL) build configurations do not compile, as the exports have not yet been fully implemented. These are currently disabled in the build scripts but you will encounter numerous errors if you build then manually.
@@ -280,7 +284,9 @@ A better configuration is to centralize the NuGet repository outside of your `gi
         nuget.config
         -bitprim-core
         -bitprim-consensus
+        -bitprim-database
         -bitprim-blockchain
+        -bitprim-network
         -bitprim-node
         -bitprim-protocol
         -bitprim-server
@@ -293,16 +299,17 @@ A better configuration is to centralize the NuGet repository outside of your `gi
                         bitprim-server.sln
     -nuget
         repositories.config
-        +boost.1.56.0.0
-        +boost_chrono-vc120.1.56.0.0
-        +boost_date_time-vc120.1.56.0.0
-        +boost_filesystem-vc120.1.56.0.0
-        +boost_iostreams-vc120.1.56.0.0
-        +boost_program_options-vc120.1.56.0.0
-        +boost_regex-vc120.1.56.0.0
-        +boost_system-vc120.1.56.0.0
-        +boost_thread-vc120.1.56.0.0
-        +boost_unit_test_framework-vc120.1.56.0.0
+        +boost.1.57.0.0
+        +boost_chrono-vc120.1.57.0.0
+        +boost_date_time-vc120.1.57.0.0
+        +boost_filesystem-vc120.1.57.0.0
+        +boost_iostreams-vc120.1.57.0.0
+        +boost_log-vc120.1.57.0.0
+        +boost_program_options-vc120.1.57.0.0
+        +boost_regex-vc120.1.57.0.0
+        +boost_system-vc120.1.57.0.0
+        +boost_thread-vc120.1.57.0.0
+        +boost_unit_test_framework-vc120.1.57.0.0
         +libzmq_vc120.4.2.2.0
         +secp256k1_vc120.0.1.0.13
 ```

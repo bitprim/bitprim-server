@@ -46,12 +46,13 @@ void transaction_pool::fetch_transaction(server_node& node,
         return;
     }
 
-    log::debug(LOG_SERVER)
+    LOG_DEBUG(LOG_SERVER)
         << "transaction_pool.fetch_transaction(" << encode_hash(hash) << ")";
 
-    node.pool().fetch(hash,
-        std::bind(pool_transaction_fetched,
-            _1, _2, request, handler));
+    // TODO: implement query on blockchain interface.
+    ////////////node.chain().fetch_pool_transaction(hash,
+    ////////////    std::bind(pool_transaction_fetched,
+    ////////////        _1, _2, request, handler));
 }
 
 // Broadcast a transaction with penetration subscription.
@@ -84,27 +85,24 @@ void transaction_pool::validate(server_node& node, const message& request,
         return;
     }
 
-    node.pool().validate(tx,
-        std::bind(&transaction_pool::handle_validated,
-            _1, _2, _3, request, handler));
+    // TODO: implement query on blockchain interface.
+    //////////node.chain().validate(tx,
+    //////////    std::bind(&transaction_pool::handle_validated,
+    //////////        _1, _2, request, handler));
 }
 
 void transaction_pool::handle_validated(const code& ec,
-    transaction_message::ptr, const point::indexes& unconfirmed,
-    const message& request, send_handler handler)
+    const point::indexes& unconfirmed, const message& request,
+    send_handler handler)
 {
     // [ code:4 ]
     // [[ unconfirmed_index:4 ]...]
     data_chunk result(code_size + unconfirmed.size() * index_size);
-    auto serial = make_serializer(result.begin());
+    auto serial = make_unsafe_serializer(result.begin());
     serial.write_error_code(ec);
 
     for (const auto unconfirmed_index: unconfirmed)
-    {
-        BITCOIN_ASSERT(unconfirmed_index <= max_uint32);
-        const auto index32 = static_cast<uint32_t>(unconfirmed_index);
-        serial.write_4_bytes_little_endian(index32);
-    }
+        serial.write_4_bytes_little_endian(unconfirmed_index);
 
     handler(message(request, result));
 }

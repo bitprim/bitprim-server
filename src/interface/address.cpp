@@ -36,8 +36,8 @@ using namespace bc::wallet;
 void address::fetch_history2(server_node& node, const message& request,
     send_handler handler)
 {
-    static constexpr uint64_t limit = 0;
-    uint32_t from_height;
+    static constexpr size_t limit = 0;
+    size_t from_height;
     payment_address address;
 
     if (!unwrap_fetch_history_args(address, from_height, request))
@@ -46,10 +46,11 @@ void address::fetch_history2(server_node& node, const message& request,
         return;
     }
 
-    // Obtain payment address history from the transaction pool and blockchain.
-    node.pool().fetch_history(address, limit, from_height,
-        std::bind(send_history_result,
-            _1, _2, request, handler));
+    // TODO: implement query on blockchain interface.
+    //////////// Obtain payment address history from the transaction pool and blockchain.
+    //////////node.chain().fetch_full_history(address, limit, from_height,
+    //////////    std::bind(send_history_result,
+    //////////        _1, _2, request, handler));
 }
 
 // v2/v3 (deprecated), used for resubscription, alias for subscribe in v3.
@@ -153,7 +154,7 @@ void address::unsubscribe2(server_node& node, const message& request,
 bool address::unwrap_subscribe2_args(binary& prefix_filter,
     const message& request)
 {
-    static constexpr auto address_bits = hash_size * byte_bits;
+//    static constexpr size_t address_bits = hash_size * byte_bits;
 
     // [ prefix_bitsize:1 ]
     // [ prefix_blocks:...]
@@ -163,11 +164,11 @@ bool address::unwrap_subscribe2_args(binary& prefix_filter,
         return false;
 
     // First byte is the number of bits.
-    const auto bit_length = data[0];
+    auto bit_length = data[0];
 
-    //Note: Fernando: address_bits = 256 and bit_length is an uint8_t, so couldn't be greater than 255. So, unnecessary test.
-    // if (bit_length > address_bits)
-    //     return false;
+    // NOTE: check commented out as redundant - all bytes are less than 256.
+//    if (bit_length > address_bits)
+//        return false;
 
     // Convert the bit length to byte length.
     const auto byte_length = binary::blocks_size(bit_length);

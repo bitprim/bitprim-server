@@ -86,7 +86,7 @@ bool notification_worker::start()
             this, _1, _2, _3, _4));
 
     // Subscribe to transaction pool acceptances.
-    node_.subscribe_transaction_pool(
+    node_.subscribe_transaction(
         std::bind(&notification_worker::handle_transaction_pool,
             this, _1, _2, _3));
 
@@ -168,13 +168,13 @@ bool notification_worker::connect(socket& router)
 
     if (ec)
     {
-        log::error(LOG_SERVER)
+        LOG_ERROR(LOG_SERVER)
             << "Failed to connect " << security << " notification worker to "
             << endpoint << " : " << ec.message();
         return false;
     }
 
-    log::debug(LOG_SERVER)
+    LOG_DEBUG(LOG_SERVER)
         << "Connected " << security << " notification worker to " << endpoint;
     return true;
 }
@@ -187,7 +187,7 @@ bool notification_worker::disconnect(socket& router)
     if (router.stop())
         return true;
 
-    log::error(LOG_SERVER)
+    LOG_ERROR(LOG_SERVER)
         << "Failed to disconnect " << security << " notification worker.";
     return false;
 }
@@ -227,7 +227,7 @@ void notification_worker::send(const route& reply_to,
 
     if (ec)
     {
-        log::warning(LOG_SERVER)
+        LOG_WARNING(LOG_SERVER)
             << "Failed to connect " << security << " notification worker: "
             << ec.message();
         return;
@@ -238,14 +238,14 @@ void notification_worker::send(const route& reply_to,
     ec = notification.send(notifier);
 
     if (ec && ec != error::service_stopped)
-        log::warning(LOG_SERVER)
+        LOG_WARNING(LOG_SERVER)
             << "Failed to send notification to "
             << notification.route().display() << " " << ec.message();
 }
 
 void notification_worker::send_payment(const route& reply_to, uint32_t id,
     const wallet::payment_address& address, uint32_t height,
-    const hash_digest& block_hash, const chain::transaction& tx)
+    const hash_digest& block_hash, const transaction& tx)
 {
     // [ address.version:1 ]
     // [ address.hash:20 ]
@@ -266,7 +266,7 @@ void notification_worker::send_payment(const route& reply_to, uint32_t id,
 
 void notification_worker::send_stealth(const route& reply_to, uint32_t id,
     uint32_t prefix, uint32_t height, const hash_digest& block_hash,
-    const chain::transaction& tx)
+    const transaction& tx)
 {
     // [ prefix:4 ]
     // [ height:4 ]
@@ -285,7 +285,7 @@ void notification_worker::send_stealth(const route& reply_to, uint32_t id,
 
 void notification_worker::send_address(const route& reply_to, uint32_t id,
     uint8_t sequence, uint32_t height, const hash_digest& block_hash,
-    const chain::transaction& tx)
+    const transaction& tx)
 {
     // [ code:4 ]
     // [ sequence:1 ]
@@ -309,7 +309,7 @@ void notification_worker::send_address(const route& reply_to, uint32_t id,
 
 bool notification_worker::handle_payment(const code& ec,
     const payment_address& address, uint32_t height,
-    const hash_digest& block_hash, const chain::transaction& tx,
+    const hash_digest& block_hash, const transaction& tx,
     const route& reply_to, uint32_t id, const binary& prefix_filter)
 {
     if (ec)
@@ -326,7 +326,7 @@ bool notification_worker::handle_payment(const code& ec,
 
 bool notification_worker::handle_stealth(const code& ec,
     uint32_t prefix, uint32_t height, const hash_digest& block_hash,
-    const chain::transaction& tx, const route& reply_to, uint32_t id,
+    const transaction& tx, const route& reply_to, uint32_t id,
     const binary& prefix_filter)
 {
     if (ec)
@@ -343,7 +343,7 @@ bool notification_worker::handle_stealth(const code& ec,
 
 bool notification_worker::handle_address(const code& ec,
     const binary& field, uint32_t height, const hash_digest& block_hash,
-    const chain::transaction& tx, const route& reply_to, uint32_t id,
+    const transaction& tx, const route& reply_to, uint32_t id,
     const binary& prefix_filter, sequence_ptr sequence)
 {
     if (ec)
@@ -458,14 +458,15 @@ void notification_worker::subscribe_penetration(const route& reply_to,
 // ----------------------------------------------------------------------------
 
 bool notification_worker::handle_blockchain_reorganization(const code& ec,
-    uint64_t fork_point, const block_list& new_blocks, const block_list&)
+    size_t fork_height, const block_const_ptr_list& new_blocks,
+    const block_const_ptr_list&)
 {
     if (stopped() || ec == error::service_stopped)
         return false;
 
     if (ec)
     {
-        log::warning(LOG_SERVER)
+        LOG_WARNING(LOG_SERVER)
             << "Failure handling new block: " << ec.message();
 
         // Don't let a failure here prevent prevent future notifications.
@@ -473,15 +474,15 @@ bool notification_worker::handle_blockchain_reorganization(const code& ec,
     }
 
     // Blockchain height is 64 bit but obelisk protocol is 32 bit.
-    BITCOIN_ASSERT(fork_point <= max_uint32);
-    const auto fork_point32 = static_cast<uint32_t>(fork_point);
+    BITCOIN_ASSERT(fork_height <= max_uint32);
+    const auto fork_height32 = static_cast<uint32_t>(fork_height);
 
-    notify_blocks(fork_point32, new_blocks);
+    notify_blocks(fork_height32, new_blocks);
     return true;
 }
 
-void notification_worker::notify_blocks(uint32_t fork_point,
-    const block_list& blocks)
+void notification_worker::notify_blocks(uint32_t fork_height,
+    const block_const_ptr_list& blocks)
 {
     if (stopped())
         return;
@@ -500,29 +501,29 @@ void notification_worker::notify_blocks(uint32_t fork_point,
 
     if (ec)
     {
-        log::warning(LOG_SERVER)
+        LOG_WARNING(LOG_SERVER)
             << "Failed to connect " << security << " notification worker: "
             << ec.message();
         return;
     }
 
     BITCOIN_ASSERT(blocks.size() <= max_uint32);
-    BITCOIN_ASSERT(fork_point < max_uint32 - blocks.size());
-    auto height = fork_point;
+    BITCOIN_ASSERT(fork_height < max_uint32 - blocks.size());
+    auto height = fork_height;
 
     for (const auto block: blocks)
         notify_block(publisher, height++, block);
 }
 
 void notification_worker::notify_block(zmq::socket& publisher, uint32_t height,
-    const chain::block::ptr block)
+    block_const_ptr block)
 {
     if (stopped())
         return;
 
-    const auto block_hash = block->header.hash();
+    const auto block_hash = block->header().hash();
 
-    for (const auto& tx: block->transactions)
+    for (const auto& tx: block->transactions())
     {
         const auto tx_hash = tx.hash();
 
@@ -536,14 +537,14 @@ void notification_worker::notify_block(zmq::socket& publisher, uint32_t height,
 // This relies on peers always notifying us of new txs via inv messages.
 
 bool notification_worker::handle_inventory(const code& ec,
-    const bc::message::inventory::ptr packet)
+    inventory_const_ptr packet)
 {
     if (stopped() || ec == error::service_stopped)
         return false;
 
     if (ec)
     {
-        log::warning(LOG_SERVER)
+        LOG_WARNING(LOG_SERVER)
             << "Failure handling inventory: " << ec.message();
 
         // Don't let a failure here prevent prevent future notifications.
@@ -551,25 +552,25 @@ bool notification_worker::handle_inventory(const code& ec,
     }
 
     // Loop inventories and extract transaction hashes.
-    for (const auto& inventory: packet->inventories)
+    for (const auto& inventory: packet->inventories())
         if (inventory.is_transaction_type())
-            notify_penetration(0, null_hash, inventory.hash);
+            notify_penetration(0, null_hash, inventory.hash());
 
     return true;
 }
 
-// Notification (via mempool).
+// Notification (via mempool and blockchain).
 // ----------------------------------------------------------------------------
 
 bool notification_worker::handle_transaction_pool(const code& ec,
-    const chain::point::indexes&, bc::message::transaction_message::ptr tx)
+    const point::indexes&, transaction_const_ptr tx)
 {
     if (stopped() || ec == error::service_stopped)
         return false;
 
     if (ec)
     {
-        log::warning(LOG_SERVER)
+        LOG_WARNING(LOG_SERVER)
             << "Failure handling new transaction: " << ec.message();
 
         // Don't let a failure here prevent future notifications.
@@ -590,14 +591,14 @@ void notification_worker::notify_transaction(uint32_t height,
     static constexpr size_t prefix_bits = sizeof(prefix) * byte_bits;
     static constexpr size_t address_bits = short_hash_size * byte_bits;
 
-    if (stopped() || tx.outputs.empty())
+    if (stopped() || tx.outputs().empty())
         return;
 
     // see data_base::push_inputs
     // Loop inputs and extract payment addresses.
-    for (const auto& input: tx.inputs)
+    for (const auto& input: tx.inputs())
     {
-        const auto address = payment_address::extract(input.script);
+        const auto address = payment_address::extract(input.script());
 
         if (address)
         {
@@ -609,9 +610,9 @@ void notification_worker::notify_transaction(uint32_t height,
 
     // see data_base::push_outputs
     // Loop outputs and extract payment addresses.
-    for (const auto& output: tx.outputs)
+    for (const auto& output: tx.outputs())
     {
-        const auto address = payment_address::extract(output.script);
+        const auto address = payment_address::extract(output.script());
 
         if (address)
         {
@@ -623,10 +624,10 @@ void notification_worker::notify_transaction(uint32_t height,
 
     // see data_base::push_stealth
     // Loop output pairs and extract stealth payments.
-    for (size_t index = 0; index < (tx.outputs.size() - 1); ++index)
+    for (size_t index = 0; index < (tx.outputs().size() - 1); ++index)
     {
-        const auto& ephemeral_script = tx.outputs[index].script;
-        const auto& payment_script = tx.outputs[index + 1].script;
+        const auto& ephemeral_script = tx.outputs()[index].script();
+        const auto& payment_script = tx.outputs()[index + 1].script();
 
         // Try to extract a stealth prefix from the first output.
         // Try to extract the payment address from the second output.

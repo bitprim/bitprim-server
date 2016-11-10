@@ -52,7 +52,7 @@ transaction_service::transaction_service(zmq::authenticator& authenticator,
 bool transaction_service::start()
 {
     // Subscribe to transaction pool acceptances.
-    node_.subscribe_transaction_pool(
+    node_.subscribe_transaction(
         std::bind(&transaction_service::handle_transaction,
             this, _1, _2, _3));
 
@@ -102,7 +102,7 @@ bool transaction_service::bind(zmq::socket& xpub, zmq::socket& xsub)
 
     if (ec)
     {
-        log::error(LOG_SERVER)
+        LOG_ERROR(LOG_SERVER)
             << "Failed to bind " << security << " transaction service to "
             << service << " : " << ec.message();
         return false;
@@ -112,13 +112,13 @@ bool transaction_service::bind(zmq::socket& xpub, zmq::socket& xsub)
 
     if (ec)
     {
-        log::error(LOG_SERVER)
+        LOG_ERROR(LOG_SERVER)
             << "Failed to bind " << security << " transaction workers to "
             << worker << " : " << ec.message();
         return false;
     }
 
-    log::info(LOG_SERVER)
+    LOG_INFO(LOG_SERVER)
         << "Bound " << security << " transaction service to " << service;
     return true;
 }
@@ -131,11 +131,11 @@ bool transaction_service::unbind(zmq::socket& xpub, zmq::socket& xsub)
     const auto security = secure_ ? "secure" : "public";
 
     if (!service_stop)
-        log::error(LOG_SERVER)
+        LOG_ERROR(LOG_SERVER)
             << "Failed to unbind " << security << " transaction service.";
 
     if (!worker_stop)
-        log::error(LOG_SERVER)
+        LOG_ERROR(LOG_SERVER)
             << "Failed to unbind " << security << " transaction workers.";
 
     // Don't log stop success.
@@ -145,27 +145,27 @@ bool transaction_service::unbind(zmq::socket& xpub, zmq::socket& xsub)
 // Publish (integral worker).
 // ----------------------------------------------------------------------------
 
-bool transaction_service::handle_transaction(const code& ec, const index_list&,
-    transaction_message::ptr tx)
+bool transaction_service::handle_transaction(const code& ec,
+    const point::indexes&, transaction_const_ptr tx)
 {
     if (stopped() || ec == error::service_stopped)
         return false;
 
     if (ec)
     {
-        log::warning(LOG_SERVER)
+        LOG_WARNING(LOG_SERVER)
             << "Failure handling new transaction: " << ec.message();
 
         // Don't let a failure here prevent prevent future notifications.
         return true;
     }
 
-    publish_transaction(*tx);
+    publish_transaction(tx);
     return true;
 }
 
 // [ tx... ]
-void transaction_service::publish_transaction(const transaction& tx)
+void transaction_service::publish_transaction(transaction_const_ptr tx)
 {
     if (stopped())
         return;
@@ -184,7 +184,7 @@ void transaction_service::publish_transaction(const transaction& tx)
 
     if (ec)
     {
-        log::warning(LOG_SERVER)
+        LOG_WARNING(LOG_SERVER)
             << "Failed to connect " << security << " transaction worker: "
             << ec.message();
         return;
@@ -194,8 +194,7 @@ void transaction_service::publish_transaction(const transaction& tx)
         return;
 
     zmq::message broadcast;
-    bc::message::transaction_message tx_msg(tx);
-    broadcast.enqueue(tx_msg.to_data(bc::message::version::level::maximum));
+    broadcast.enqueue(tx->to_data(bc::message::version::level::maximum));
     ec = publisher.send(broadcast);
 
     if (ec == error::service_stopped)
@@ -203,17 +202,17 @@ void transaction_service::publish_transaction(const transaction& tx)
 
     if (ec)
     {
-        log::warning(LOG_SERVER)
+        LOG_WARNING(LOG_SERVER)
             << "Failed to publish " << security << " transaction ["
-            << encode_hash(tx_msg.hash()) << "] " << ec.message();
+            << encode_hash(tx->hash()) << "] " << ec.message();
         return;
     }
 
     // This isn't actually a request, should probably update settings.
     if (settings_.log_requests)
-        log::debug(LOG_SERVER)
+        LOG_DEBUG(LOG_SERVER)
             << "Published " << security << " transaction ["
-            << encode_hash(tx_msg.hash()) << "]";
+            << encode_hash(tx->hash()) << "]";
 }
 
 } // namespace server
