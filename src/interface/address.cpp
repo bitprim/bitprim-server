@@ -165,8 +165,9 @@ bool address::unwrap_subscribe2_args(binary& prefix_filter,
     // First byte is the number of bits.
     const auto bit_length = data[0];
 
-    if (bit_length > address_bits)
-        return false;
+    //Note: Fernando: address_bits = 256 and bit_length is an uint8_t, so couldn't be greater than 255. So, unnecessary test.
+    // if (bit_length > address_bits)
+    //     return false;
 
     // Convert the bit length to byte length.
     const auto byte_length = binary::blocks_size(bit_length);
