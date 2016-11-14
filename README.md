@@ -50,6 +50,10 @@ Next install the [Boost](http://www.boost.org) (minimum 1.56.0) development pack
 ```sh
 $ sudo apt-get install libboost-all-dev
 ```
+If you intend to use libbbitcoin-consensus (this is the default), you will also need libcrypto:
+```sh
+$ sudo apt-get install libssl-dev
+```
 Next install the [ZeroMQ](http://zeromq.org/) (minimum 4.2.0) development package:
 ```sh
 $ git clone https://github.com/zeromq/libzmq
