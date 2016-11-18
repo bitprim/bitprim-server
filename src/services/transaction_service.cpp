@@ -146,7 +146,7 @@ bool transaction_service::unbind(zmq::socket& xpub, zmq::socket& xsub)
 // ----------------------------------------------------------------------------
 
 bool transaction_service::handle_transaction(const code& ec,
-    const point::indexes&, transaction_const_ptr tx)
+    const chain::point::indexes&, transaction_const_ptr tx)
 {
     if (stopped() || ec == error::service_stopped)
         return false;
