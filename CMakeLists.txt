@@ -39,8 +39,8 @@ find_package(
 
 # Require bitprim-node of at least version 3.0.0 and output ${bitprim_node_CPPFLAGS/LIBS/PKG}.
 #------------------------------------------------------------------------------
-if (NOT TARGET bitprim-client)
-  find_package(bitprim-client 3.0.0 REQUIRED)
+if (NOT TARGET bitprim-node)
+  find_package(bitprim-node 3.0.0 REQUIRED)
 endif()
 
 # Require bitprim-protocol of at least version 3.0.0 and output ${bitprim_protocol_CPPFLAGS/LIBS/PKG}.
