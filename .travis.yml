@@ -350,21 +350,21 @@ install:
   - wget -O build_bitprim.sh  https://raw.githubusercontent.com/hanchon/travis_complete_cache/master/build_bitprim.sh
   - sudo chmod 777 build_bitprim.sh
   #Install bitprim-secp256k1
-  - ./build_bitprim.sh secp256k1 "${TRAVIS_OS_NAME}"
+  #- ./build_bitprim.sh secp256k1 "${TRAVIS_OS_NAME}"
   #Install bitprim-core
-  - ./build_bitprim.sh core "${TRAVIS_OS_NAME}"
+  #- ./build_bitprim.sh core "${TRAVIS_OS_NAME}"
   #Install bitprim-consensus
-  - ./build_bitprim.sh consensus "${TRAVIS_OS_NAME}"
+  #- ./build_bitprim.sh consensus "${TRAVIS_OS_NAME}"
   #Install bitprim-database
-  - ./build_bitprim.sh database "${TRAVIS_OS_NAME}"
+  #- ./build_bitprim.sh database "${TRAVIS_OS_NAME}"
   #Install bitprim-blockchain
-  - ./build_bitprim.sh blockchain "${TRAVIS_OS_NAME}"
+  #- ./build_bitprim.sh blockchain "${TRAVIS_OS_NAME}"
   #Install bitprim-network
-  - ./build_bitprim.sh network "${TRAVIS_OS_NAME}"
+  #- ./build_bitprim.sh network "${TRAVIS_OS_NAME}"
   #Install bitprim-node
-  - ./build_bitprim.sh node "${TRAVIS_OS_NAME}"
+  #- ./build_bitprim.sh node "${TRAVIS_OS_NAME}"
   #Install bitprim-protocol
-  - ./build_bitprim.sh protocol "${TRAVIS_OS_NAME}"
+  #- ./build_bitprim.sh protocol "${TRAVIS_OS_NAME}"
 
 before_script:
   ############################################################################
@@ -379,12 +379,14 @@ before_script:
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir build 
   - cd build 
-  - cmake .. -DWITH_TESTS=OFF -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_FLAGS="${CXX_FLAGS}" ${BOOST_OPTS}
+  #- cmake .. -DWITH_TESTS=OFF -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_FLAGS="${CXX_FLAGS}" ${BOOST_OPTS}
+  - echo "before_script"
 
 script:
 
-  - make -j2 
-  - sudo make install
+  #- make -j2 
+  #- sudo make install
+  - echo "script"
 
 notifications:
   email: false
