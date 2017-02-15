@@ -1,21 +1,20 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
- * This file is part of libbitcoin-server.
+ * This file is part of libbitcoin.
  *
- * libbitcoin-server is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/server/interface/blockchain.hpp>
 
@@ -61,20 +60,21 @@ void blockchain::fetch_history(server_node& node, const message& request,
 void blockchain::fetch_transaction(server_node& node, const message& request,
     send_handler handler)
 {
-    hash_digest tx_hash;
+    hash_digest hash;
 
-    if (!unwrap_fetch_transaction_args(tx_hash, request))
+    if (!unwrap_fetch_transaction_args(hash, request))
     {
         handler(message(request, error::bad_stream));
         return;
     }
 
     LOG_DEBUG(LOG_SERVER)
-        << "blockchain.fetch_transaction(" << encode_hash(tx_hash) << ")";
+        << "blockchain.fetch_transaction(" << encode_hash(hash) << ")";
 
-    node.chain().fetch_transaction(tx_hash,
-        std::bind(block_transaction_fetched,
-            _1, _2, _3, request, handler));
+    // The response is restricted to confirmed transactions.
+    node.chain().fetch_transaction(hash, true,
+        std::bind(transaction_fetched,
+            _1, _2, _3, _4, request, handler));
 }
 
 void blockchain::fetch_last_height(server_node& node, const message& request,
@@ -213,13 +213,13 @@ void blockchain::merkle_block_fetched(const code& ec, merkle_block_ptr block,
     auto serial = make_unsafe_serializer(result.begin());
     serial.write_error_code(ec);
 
-    for (const auto& tx_hash: block->hashes())
-        serial.write_hash(tx_hash);
+    for (const auto& hash: block->hashes())
+        serial.write_hash(hash);
 
     handler(message(request, result));
 }
 
-void blockchain::fetch_transaction_position(server_node& node,
+void blockchain::fetch_transaction_index(server_node& node,
     const message& request, send_handler handler)
 {
     const auto& data = request.data();
@@ -231,14 +231,15 @@ void blockchain::fetch_transaction_position(server_node& node,
     }
 
     auto deserial = make_safe_deserializer(data.begin(), data.end());
-    const auto tx_hash = deserial.read_hash();
+    const auto hash = deserial.read_hash();
 
-    node.chain().fetch_transaction_position(tx_hash,
-        std::bind(&blockchain::transaction_position_fetched,
+    // The response is restricted to confirmed transactions (backward compat).
+    node.chain().fetch_transaction_position(hash, false,
+        std::bind(&blockchain::transaction_index_fetched,
             _1, _2, _3, request, handler));
 }
 
-void blockchain::transaction_position_fetched(const code& ec,
+void blockchain::transaction_index_fetched(const code& ec,
     size_t tx_position, size_t block_height, const message& request,
     send_handler handler)
 {

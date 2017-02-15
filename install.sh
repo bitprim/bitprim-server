@@ -718,7 +718,7 @@ build_all()
     build_from_github zeromq libzmq master $PARALLEL ${ZMQ_OPTIONS[@]} "$@"
     build_from_github bitprim secp256k1 version4 $PARALLEL ${SECP256K1_OPTIONS[@]} "$@"
     build_from_github bitprim bitprim-core master $PARALLEL ${BITCOIN_OPTIONS[@]} "$@"
-    build_from_github bitprim bitprim-consensus version2 $PARALLEL ${BITCOIN_CONSENSUS_OPTIONS[@]} "$@"
+    build_from_github bitprim bitprim-consensus master $PARALLEL ${BITCOIN_CONSENSUS_OPTIONS[@]} "$@"
     build_from_github bitprim bitprim-database master $PARALLEL ${BITCOIN_DATABASE_OPTIONS[@]} "$@"
     build_from_github bitprim bitprim-blockchain master $PARALLEL ${BITCOIN_BLOCKCHAIN_OPTIONS[@]} "$@"
     build_from_github bitprim bitprim-network master $PARALLEL ${BITCOIN_NETWORK_OPTIONS[@]} "$@"

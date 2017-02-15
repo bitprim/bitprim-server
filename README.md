@@ -6,7 +6,17 @@
 
 **License Overview**
 
-All files in this repository fall under the license specified in [COPYING](COPYING). The project is licensed as [AGPL with a lesser clause](https://wiki.unsystem.net/en/index.php/Libbitcoin/License). It may be used within a proprietary project, but the core library and any changes to it must be published online. Source code for this library must always remain free for everybody to access.
+All files in this repository fall under the license specified in [COPYING](https://github.com/libbitcoin/libbitcoin-server/blob/master/COPYING). The project is licensed as [AGPL with a lesser clause](https://wiki.unsystem.net/en/index.php/Libbitcoin/License). It may be used within a proprietary project, but the core library and any changes to it must be published on-line. Source code for this library must always remain free for everybody to access.
+
+**About Libbitcoin**
+
+The libbitcoin toolkit is a set of cross platform C++ libraries for building bitcoin applications. The toolkit consists of several libraries, most of which depend on the foundational [libbitcoin](https://github.com/libbitcoin/libbitcoin) library. Each library's repository can be cloned and built using common [Automake](http://www.gnu.org/software/automake) instructions.
+
+**About Libbitcoin Server**
+
+A full Bitcoin peer-to-peer node, Libbitcoin Server is also a high performance blockchain query server. It can be built as a single portable executable for Linux, OSX or Windows and is available for download as a signed single executable for each. It is trivial to deploy, just run the single process and allow it about two days to synchronize the Bitcoin blockchain.
+
+Libbitcoin Server exposes a custom query TCP API built based on the [ZeroMQ](http://zeromq.org) networking stack. It supports server, and optionally client, identity certificates and wire encryption via [CurveZMQ](http://curvezmq.org) and the [Sodium](http://libsodium.org) cryptographic library.
 
 **About Bitprim**
 
@@ -50,9 +60,10 @@ Next install the [Boost](http://www.boost.org) (minimum 1.56.0) development pack
 ```sh
 $ sudo apt-get install libboost-all-dev
 ```
-If you intend to use libbbitcoin-consensus (this is the default), you will also need libcrypto:
+Next download the [install script](https://github.com/libbitcoin/libbitcoin-server/blob/version3/install.sh) and enable execution:
 ```sh
-$ sudo apt-get install libssl-dev
+$ wget https://raw.githubusercontent.com/libbitcoin/libbitcoin-server/version3/install.sh
+$ chmod +x install.sh
 ```
 Next install the [ZeroMQ](http://zeromq.org/) (minimum 4.2.0) development package:
 ```sh
@@ -137,7 +148,10 @@ Next install the [Boost](http://www.boost.org) (1.56.0 or newer) development pac
 ```sh
 $ brew install boost
 ```
-Next install the [ZeroMQ](http://zeromq.org/) (minimum 4.2.0) development package:
+Next download the [install script](https://github.com/libbitcoin/libbitcoin-server/blob/version3/install.sh) and enable execution:
+```sh
+$ wget https://raw.githubusercontent.com/libbitcoin/libbitcoin-server/version3/install.sh
+$ chmod +x install.sh
 ```
 TODO: ZeroMQ Mac Install
 ```
@@ -145,7 +159,10 @@ Next install the [Protobuff](https://github.com/google/protobuf) (minimum 3.0.0)
 ```
 TODO: Protobuff Mac Install
 ```
-Finally install bitprim:
+Next download the [install script](https://github.com/libbitcoin/libbitcoin-server/blob/version3/install.sh) and enable execution:
+```sh
+$ wget https://raw.githubusercontent.com/libbitcoin/libbitcoin-server/version3/install.sh
+$ chmod +x install.sh
 ```
 TODO: Mac Install
 ```
@@ -181,7 +198,9 @@ Bitprim is now installed in `/usr/local/`.
 
 The install script itself is commented so that the manual build steps for each dependency can be inferred by a developer.
 
-You can run the install script from any directory on your system. By default this will build bitprim in a subdirectory named `build-bitprim` and install it to `/usr/local/`. The install script requires `sudo` only if you do not have access to the installation location, which you can change using the `--prefix` option on the installer command line.
+* [Visual Studio 2013 Express](https://www.microsoft.com/en-us/download/details.aspx?id=44914)
+* [November 2013 CTP Compiler](http://www.microsoft.com/en-us/download/details.aspx?id=41151)
+* See also: [CTP Compiler installation issue](http://stackoverflow.com/a/34548651/1172329)
 
 The build script clones, builds and installs two unpackaged repositories, namely:
 
@@ -190,7 +209,141 @@ The build script clones, builds and installs two unpackaged repositories, namely
 
 The script builds from the head of their `version4` and `version2` branches respectively. The `master` branch is a staging area for changes. The version branches are considered release quality.
 
-### Windows
+* Packages maintained by [sergey.shandar](http://www.nuget.org/profiles/sergey.shandar)
+   * [boost](http://www.nuget.org/packages/boost)
+   * [boost\_chrono-vc120](http://www.nuget.org/packages/boost_chrono-vc120)
+   * [boost\_date\_time-vc120](http://www.nuget.org/packages/boost_date_time-vc120)
+   * [boost\_filesystem-vc120](http://www.nuget.org/packages/boost_filesystem-vc120)
+   * [boost\_iostreams-vc120](http://www.nuget.org/packages/boost_iostreams-vc120)
+   * [boost\_log-vc120](http://www.nuget.org/packages/boost_log-vc120)
+   * [boost\_program\_options-vc120](http://www.nuget.org/packages/boost_program_options-vc120)
+   * [boost\_regex-vc120](http://www.nuget.org/packages/boost_regex-vc120)
+   * [boost\_system-vc120](http://www.nuget.org/packages/boost_system-vc120)
+   * [boost\_thread-vc120](http://www.nuget.org/packages/boost_thread-vc120)
+   * [boost\_unit\_test\_framework-vc120](http://www.nuget.org/packages/boost_unit_test_framework-vc120)
+* Packages maintained by [evoskuil](http://www.nuget.org/profiles/evoskuil)
+   * [libzmq\_vc120](http://www.nuget.org/packages/libzmq_vc120)
+   * [secp256k1\_vc120](http://www.nuget.org/packages/secp256k1_vc120)
+
+#### Build Libbitcoin Projects
+
+To build Libbitcoin Server you must also download and build its **libbitcoin dependencies**, as these are not yet packaged. The builds can be performed manually (from within Visual Studio) or using the `buildall.bat` script provided in the `builds\msvc\build\` subdirectory of each repository. The scripts automatically download the required NuGet packages.
+
+> Tip: The `buildall.bat` scripts build *all* valid configurations. The build time can be significantly reduced by disabling all but the desired configuration in the `buildbase.bat` of each project.
+
+Build these solutions in order:
+
+1. [libbitcoin/libbitcoin](https://github.com/libbitcoin/libbitcoin)
+2. [libbitcoin/libbitcoin-consensus](https://github.com/libbitcoin/libbitcoin-consensus)
+2. [libbitcoin/libbitcoin-database](https://github.com/libbitcoin/libbitcoin-database)
+2. [libbitcoin/libbitcoin-blockchain](https://github.com/libbitcoin/libbitcoin-blockchain)
+2. [libbitcoin/libbitcoin-network](https://github.com/libbitcoin/libbitcoin-network)
+2. [libbitcoin/libbitcoin-node](https://github.com/libbitcoin/libbitcoin-node)
+2. [libbitcoin/libbitcoin-protocol](https://github.com/libbitcoin/libbitcoin-protocol)
+3. [libbitcoin/libbitcoin-server](https://github.com/libbitcoin/libbitcoin-server)
+
+> The libbitcoin dynamic (DLL) build configurations do not compile, as the exports have not yet been fully implemented. These are currently disabled in the build scripts but you will encounter numerous errors if you build then manually.
+
+Configuration options are exposed in the Visual Studio property pages.
+
+#### Optional: Build Everything
+
+The non-boost packages above are all sourced from GitHub repositories maintained using the same [Visual Studio template](https://github.com/evoskuil/visual-studio-template) as the libbitcoin libraries. If so desired each of these can be built locally, in the same manner as the libbitcoin libraries above. This allows you to avoid using the pre-built NuGet packages. The repositories for each dependency are as follows:
+
+* Cryptography
+   * [libbitcoin/secp256k1](https://github.com/libbitcoin/secp256k1)
+* Zero Message Queue
+   * [zeromq/libzmq](https://github.com/zeromq/libzmq)
+
+This change is properly accomplished by disabling the "NuGet Dependencies" in the Visual Studio properties user interface for each libbitcoin project and then importing the `.import.props` file(s) for the corresponding dependencies.
+
+#### NuGet Repository
+NuGet packages are downloaded to a local file systems repository. By default the [NuGet Package Manager](http://visualstudiogallery.msdn.microsoft.com/27077b70-9dad-4c64-adcf-c7cf6bc9970c) uses a repository path within the solution. This can complicate source control and results in multiple repositories across solutions.
+
+A better configuration is to centralize the NuGet repository outside of your `git` directory, for example:
+
 ```
-TODO:Windows Install
+-me
+    -git
+        nuget.config
+        -libbitcoin
+        -libbitcoin-consensus
+        -libbitcoin-database
+        -libbitcoin-blockchain
+        -libbitcoin-network
+        -libbitcoin-node
+        -libbitcoin-protocol
+        -libbitcoin-server
+            -builds
+                -msvc
+                    -vs2013
+                        -bitcoin-server
+                            bitcoin-server.vcxproj
+                            packages.config
+                        libbitcoin-server.sln
+    -nuget
+        repositories.config
+        +boost.1.57.0.0
+        +boost_chrono-vc120.1.57.0.0
+        +boost_date_time-vc120.1.57.0.0
+        +boost_filesystem-vc120.1.57.0.0
+        +boost_iostreams-vc120.1.57.0.0
+        +boost_log-vc120.1.57.0.0
+        +boost_program_options-vc120.1.57.0.0
+        +boost_regex-vc120.1.57.0.0
+        +boost_system-vc120.1.57.0.0
+        +boost_thread-vc120.1.57.0.0
+        +boost_unit_test_framework-vc120.1.57.0.0
+        +libzmq_vc120.4.2.2.0
+        +secp256k1_vc120.0.1.0.13
 ```
+
+If properly configured the NuGet Package Manager will share this NuGet repository across all solutions within the `git` directory. There are three steps required in this configuration:
+
+* Create a `nuget` directory as a sibling to your `git` directory.
+* Create a `nuget.config` file in the root of your `git` directory.
+* Ensure there are no other `nuget.config` files in your `git` directory.
+
+The `nuget.config` should have the [documented structure](http://docs.nuget.org/docs/reference/nuget-config-settings) and should refer to the relative `nuget` directory `..\nuget` as follows:
+
+```xml
+<configuration>
+  <config>
+    <!-- Allows you to install the NuGet packages in the specified folder,
+    instead of the default "$(Solutiondir)\Packages" folder. -->
+    <add key="repositoryPath" value="..\nuget" />
+  </config>
+  <solution>
+    <!-- Disable source control integration for the "Packages" folder. -->
+    <add key="disableSourceControlIntegration" value="true" />
+  </solution>
+  <packageRestore>
+    <!-- Allow NuGet to download missing packages -->
+    <add key="enabled" value="false" />
+    <!-- Automatically check for missing packages during build in Visual Studio -->
+    <add key="automatic" value="false" />
+  </packageRestore>
+  <packageSources>
+    <!-- Allows you to specify the list of sources to be used while looking for packages. -->
+    <add key="NuGet official package source" value="https://nuget.org/api/v2/" />
+  </packageSources>
+  <disabledPackageSources>
+    <!-- "DisabledPackageSources" has the list of sources which are currently disabled. -->
+  </disabledPackageSources>
+  <activePackageSource>
+    <!-- "ActivePackageSource" points to the currently active source. 
+    Specifying "(Aggregate source)" as the source value would imply that
+    all the current package sources except for the disabled ones are active. -->
+    <add key="All" value="(Aggregate source)"  />
+  </activePackageSource>
+  <packageSourceCredentials>
+    <!-- Allows you to set the credentials to access the given package source. -->
+    <!-- <feedName>
+    <add key="Username" value="foobar" />
+    <add key="ClearTextPassword" value="secret" />
+    </feedName> -->
+  </packageSourceCredentials>
+</configuration>
+```
+
+With this configuration in place you should experience the following behavior. When you open one of these Visual Studio projects and then open the Package Manager, you may be informed that there are missing packages. Upon authorizing download of the packages you will see them appear in the `nuget` directory. You will then be able to compile the project(s).

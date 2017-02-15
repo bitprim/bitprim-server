@@ -1,21 +1,20 @@
 /**
- * Copyright (c) 2011-2016 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
- * This file is part of libbitcoin-server.
+ * This file is part of libbitcoin.
  *
- * libbitcoin-server is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/server/services/block_service.hpp>
 
@@ -24,6 +23,7 @@
 #include <memory>
 #include <bitcoin/protocol.hpp>
 #include <bitcoin/server/configuration.hpp>
+#include <bitcoin/server/define.hpp>
 #include <bitcoin/server/server_node.hpp>
 #include <bitcoin/server/settings.hpp>
 
@@ -145,7 +145,7 @@ bool block_service::unbind(zmq::socket& xpub, zmq::socket& xsub)
 // ----------------------------------------------------------------------------
 
 bool block_service::handle_reorganization(const code& ec, size_t fork_height,
-    const block_const_ptr_list& new_blocks, const block_const_ptr_list&)
+    block_const_ptr_list_const_ptr new_blocks, block_const_ptr_list_const_ptr)
 {
     if (stopped() || ec == error::service_stopped)
         return false;
@@ -160,15 +160,12 @@ bool block_service::handle_reorganization(const code& ec, size_t fork_height,
     }
 
     // Blockchain height is 64 bit but obelisk protocol is 32 bit.
-    BITCOIN_ASSERT(fork_height <= max_uint32);
-    const auto fork_height32 = static_cast<uint32_t>(fork_height);
-
-    publish_blocks(fork_height32, new_blocks);
+    publish_blocks(safe_unsigned<uint32_t>(fork_height), new_blocks);
     return true;
 }
 
 void block_service::publish_blocks(uint32_t fork_height,
-    const block_const_ptr_list& blocks)
+    block_const_ptr_list_const_ptr blocks)
 {
     if (stopped())
         return;
@@ -187,17 +184,18 @@ void block_service::publish_blocks(uint32_t fork_height,
 
     if (ec)
     {
-        LOG_WARNING(LOG_SERVER)
-            << "Failed to connect " << security << " block worker: "
-            << ec.message();
+        // TODO: fix socket so that it can detect context stopped.
+        ////LOG_WARNING(LOG_SERVER)
+        ////    << "Failed to connect " << security << " block worker: "
+        ////    << ec.message();
         return;
     }
 
-    BITCOIN_ASSERT(blocks.size() <= max_uint32);
-    BITCOIN_ASSERT(fork_height < max_uint32 - blocks.size());
+    BITCOIN_ASSERT(blocks->size() <= max_uint32);
+    BITCOIN_ASSERT(fork_height < max_uint32 - blocks->size());
     auto height = fork_height;
 
-    for (const auto block: blocks)
+    for (const auto block: *blocks)
         publish_block(publisher, height++, block);
 }
 
@@ -216,7 +214,7 @@ void block_service::publish_block(zmq::socket& publisher, uint32_t height,
 
     zmq::message broadcast;
     broadcast.enqueue_little_endian(height);
-    broadcast.enqueue(block->to_data(false));
+    broadcast.enqueue(block->to_data(bc::message::version::level::maximum));
     const auto ec = publisher.send(broadcast);
 
     if (ec == error::service_stopped)

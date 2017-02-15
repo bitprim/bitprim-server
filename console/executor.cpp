@@ -1,21 +1,20 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
- * This file is part of libbitcoin-server.
+ * This file is part of libbitcoin.
  *
- * libbitcoin-server is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "executor.hpp"
 
@@ -25,7 +24,6 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <boost/core/null_deleter.hpp>
 #include <bitcoin/server.hpp>
 
@@ -126,9 +124,11 @@ bool executor::do_initchain()
     {
         LOG_INFO(LOG_SERVER) << format(BS_INITIALIZING_CHAIN) % directory;
 
-        // Unfortunately we are still limited to a choice of hardcoded chains.
-        const auto genesis = metadata_.configured.chain.use_testnet_rules ?
-            block::genesis_testnet() : block::genesis_mainnet();
+        const auto testnet = metadata_.configured.chain.easy_blocks;
+
+        // Unfortunately we are limited to a choice of hardcoded chains.
+        const auto genesis = testnet ? block::genesis_testnet() :
+            block::genesis_mainnet();
 
         const auto& settings = metadata_.configured.database;
         const auto result = data_base(settings).create(genesis);
@@ -199,6 +199,10 @@ bool executor::run()
     // Now that the directory is verified we can create the node for it.
     node_ = std::make_shared<server_node>(metadata_.configured);
 
+    // Initialize broadcast to statistics server if configured.
+    log::initialize_statsd(node_->thread_pool(),
+        metadata_.configured.network.statistics_server);
+
     // The callback may be returned on the same thread.
     node_->start(
         std::bind(&executor::handle_started,
@@ -266,9 +270,10 @@ void executor::handle_stopped(const code& ec)
 void executor::handle_stop(int code)
 {
     // Reinitialize after each capture to prevent hard shutdown.
+    // Do not capture failure signals as calling stop can cause flush lock file
+    // to clear due to the aborted thread dropping the flush lock mutex.
     std::signal(SIGINT, handle_stop);
     std::signal(SIGTERM, handle_stop);
-    std::signal(SIGABRT, handle_stop);
 
     if (code == initialize_stop)
         return;
@@ -289,11 +294,12 @@ void executor::stop(const code& ec)
 // Set up logging.
 void executor::initialize_output()
 {
-    LOG_DEBUG(LOG_SERVER) << BS_LOG_HEADER;
-    LOG_INFO(LOG_SERVER) << BS_LOG_HEADER;
-    LOG_WARNING(LOG_SERVER) << BS_LOG_HEADER;
-    LOG_ERROR(LOG_SERVER) << BS_LOG_HEADER;
-    LOG_FATAL(LOG_SERVER) << BS_LOG_HEADER;
+    const auto header = format(BS_LOG_HEADER) % local_time();
+    LOG_DEBUG(LOG_SERVER) << header;
+    LOG_INFO(LOG_SERVER) << header;
+    LOG_WARNING(LOG_SERVER) << header;
+    LOG_ERROR(LOG_SERVER) << header;
+    LOG_FATAL(LOG_SERVER) << header;
 
     const auto& file = metadata_.configured.file;
 
@@ -323,7 +329,7 @@ bool executor::verify_directory()
     return false;
 }
 
-// Increase the configured minomum as required to operate the service.
+// Increase the configured minimum as required to operate the service.
 void executor::set_minimum_threadpool_size()
 {
     metadata_.configured.network.threads =

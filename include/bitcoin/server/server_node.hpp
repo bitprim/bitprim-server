@@ -1,21 +1,20 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
- * This file is part of libbitcoin-server.
+ * This file is part of libbitcoin.
  *
- * libbitcoin-server is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LIBBITCOIN_SERVER_SERVER_NODE_HPP
 #define LIBBITCOIN_SERVER_SERVER_NODE_HPP
@@ -86,11 +85,11 @@ public:
     /// Subscribe to address (including stealth) prefix notifications.
     /// Stealth prefix is limited to 32 bits, address prefix to 256 bits.
     virtual void subscribe_address(const route& reply_to, uint32_t id,
-        const binary& prefix_filter, chain::subscribe_type type);
+        const binary& prefix_filter, bool unsubscribe);
 
-    /// Subscribe to transaction penetration notifications.
-    virtual void subscribe_penetration(const route& reply_to, uint32_t id,
-        const hash_digest& tx_hash);
+    /////// Subscribe to transaction penetration notifications.
+    ////virtual void subscribe_penetration(const route& reply_to, uint32_t id,
+    ////    const hash_digest& tx_hash);
 
 private:
     void handle_running(const code& ec, result_handler handler);

@@ -1,21 +1,20 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
- * This file is part of libbitcoin-server.
+ * This file is part of libbitcoin.
  *
- * libbitcoin-server is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LIBBITCOIN_SERVER_FETCH_HELPERS_HPP
 #define LIBBITCOIN_SERVER_FETCH_HELPERS_HPP
@@ -48,16 +47,8 @@ void BCS_API send_history_result(const code& ec,
 bool BCS_API unwrap_fetch_transaction_args(hash_digest& hash,
     const message& request);
 
-void BCS_API chain_transaction_fetched(const code& ec,
-    const chain::transaction& tx, const message& request,
-    send_handler handler);
-
-void BCS_API block_transaction_fetched(const code& ec,
-    bc::message::transaction_message::ptr tx, uint64_t height,
-    const message& request, send_handler handler);
-
-void BCS_API pool_transaction_fetched(const code& ec,
-    bc::message::transaction_message::ptr tx, const message& request,
+void BCS_API transaction_fetched(const code& ec, transaction_ptr tx,
+    size_t height, size_t position, const message& request,
     send_handler handler);
 
 } // namespace server

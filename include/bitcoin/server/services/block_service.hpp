@@ -1,21 +1,20 @@
 /**
- * Copyright (c) 2011-2016 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
- * This file is part of libbitcoin-server.
+ * This file is part of libbitcoin.
  *
- * libbitcoin-server is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef LIBBITCOIN_SERVER_BLOCK_SERVICE_HPP
 #define LIBBITCOIN_SERVER_BLOCK_SERVICE_HPP
@@ -64,9 +63,11 @@ protected:
 
 private:
     bool handle_reorganization(const code& ec, size_t fork_height,
-        const block_const_ptr_list& new_blocks, const block_const_ptr_list&);
+        block_const_ptr_list_const_ptr new_blocks,
+        block_const_ptr_list_const_ptr old_blocks);
+
     void publish_blocks(uint32_t fork_height,
-        const block_const_ptr_list& blocks);
+        block_const_ptr_list_const_ptr blocks);
     void publish_block(socket& publisher, uint32_t height,
         block_const_ptr block);
 

@@ -1,21 +1,20 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
- * This file is part of libbitcoin-server.
+ * This file is part of libbitcoin.
  *
- * libbitcoin-server is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/server/server_node.hpp>
 
@@ -48,7 +47,7 @@ server_node::server_node(const configuration& configuration)
     secure_transaction_service_(authenticator_, *this, true),
     public_transaction_service_(authenticator_, *this, false),
     secure_notification_worker_(authenticator_, *this, true),
-    public_notification_worker_(authenticator_, *this, true)
+    public_notification_worker_(authenticator_, *this, false)
 {
 }
 
@@ -120,29 +119,29 @@ bool server_node::close()
 // Notification.
 // ----------------------------------------------------------------------------
 
-// Subscribe to address (including stealth) prefix notifications.
+// Subscribe (or unsubscribe) to address/stealth prefix notifications.
 void server_node::subscribe_address(const route& reply_to, uint32_t id,
-    const binary& prefix_filter, subscribe_type type)
+    const binary& prefix_filter, bool unsubscribe)
 {
     if (reply_to.secure)
         secure_notification_worker_
-            .subscribe_address(reply_to, id, prefix_filter, type);
+            .subscribe_address(reply_to, id, prefix_filter, unsubscribe);
     else
         public_notification_worker_
-            .subscribe_address(reply_to, id, prefix_filter, type);
+            .subscribe_address(reply_to, id, prefix_filter, unsubscribe);
 }
 
-// Subscribe to transaction penetration notifications.
-void server_node::subscribe_penetration(const route& reply_to, uint32_t id,
-    const hash_digest& tx_hash)
-{
-    if (reply_to.secure)
-        secure_notification_worker_
-            .subscribe_penetration(reply_to, id, tx_hash);
-    else
-        public_notification_worker_
-            .subscribe_penetration(reply_to, id, tx_hash);
-}
+////// Subscribe to transaction penetration notifications.
+////void server_node::subscribe_penetration(const route& reply_to, uint32_t id,
+////    const hash_digest& tx_hash)
+////{
+////    if (reply_to.secure)
+////        secure_notification_worker_
+////            .subscribe_penetration(reply_to, id, tx_hash);
+////    else
+////        public_notification_worker_
+////            .subscribe_penetration(reply_to, id, tx_hash);
+////}
 
 // Services.
 // ----------------------------------------------------------------------------
@@ -158,11 +157,11 @@ bool server_node::start_services()
 bool server_node::start_authenticator()
 {
     const auto& settings = configuration_.server;
-    const auto heartbeat_interval = settings.heartbeat_interval_seconds;
 
+    // Subscriptions require the query service.
     if ((!settings.server_private_key && settings.secure_only) ||
-        ((!settings.query_service_enabled || settings.query_workers == 0) &&
-        (!settings.heartbeat_service_enabled || heartbeat_interval == 0) &&
+        ((settings.query_workers == 0) &&
+        (settings.heartbeat_interval_seconds == 0) &&
         (!settings.block_service_enabled) &&
         (!settings.transaction_service_enabled)))
         return true;
@@ -174,7 +173,8 @@ bool server_node::start_query_services()
 {
     const auto& settings = configuration_.server;
 
-    if (!settings.query_service_enabled || settings.query_workers == 0)
+    // Subscriptions require the query service.
+    if (settings.query_workers == 0)
         return true;
 
     // Start secure service, query workers and notification workers if enabled.
@@ -188,7 +188,7 @@ bool server_node::start_query_services()
         (settings.subscription_limit > 0 && !public_notification_worker_.start()) ||
         !start_query_workers(false)))
             return false;
-    
+
     return true;
 }
 
@@ -196,8 +196,7 @@ bool server_node::start_heartbeat_services()
 {
     const auto& settings = configuration_.server;
 
-    if (!settings.heartbeat_service_enabled ||
-        settings.heartbeat_interval_seconds == 0)
+    if (settings.heartbeat_interval_seconds == 0)
         return true;
 
     // Start secure service if enabled.
@@ -271,43 +270,54 @@ bool server_node::start_query_workers(bool secure)
 uint32_t server_node::threads_required(const configuration& configuration)
 {
     const auto& settings = configuration.server;
-    const auto threads = configuration.network.threads;
-    const auto heartbeat_interval = settings.heartbeat_interval_seconds;
 
     // The network/node requires a minimum of one thread.
     uint32_t required = 1;
 
-    if (settings.query_service_enabled && settings.query_workers > 0)
+    if (settings.query_workers > 0)
     {
         if (settings.server_private_key)
         {
+            // Secure query service.
             ++required;
+
+            // Secure query worker.
             required += settings.query_workers;
-            required += (settings.subscription_limit > 0 ? 4 : 0);
+
+            // Secure notification worker.
+            required += (settings.subscription_limit > 0 ? 1 : 0);
         }
 
         if (!settings.secure_only)
         {
+            // Public query service.
             ++required;
+
+            // Public query worker.
             required += settings.query_workers;
-            required += (settings.subscription_limit > 0 ? 4 : 0);
+
+            // Public notification worker.
+            required += (settings.subscription_limit > 0 ? 1 : 0);
         }
     }
 
-    if (settings.heartbeat_service_enabled && heartbeat_interval > 0)
+    if (settings.heartbeat_interval_seconds > 0)
     {
+        // Secure and/or public heartbeat service.
         required += (settings.server_private_key ? 1 : 0);
         required += (settings.secure_only ? 0 : 1);
     }
 
     if (settings.block_service_enabled)
     {
+        // Secure and/or block publish service.
         required += (settings.server_private_key ? 1 : 0);
         required += (settings.secure_only ? 0 : 1);
     }
 
     if (settings.transaction_service_enabled)
     {
+        // Secure and/or transaction publish service.
         required += (settings.server_private_key ? 1 : 0);
         required += (settings.secure_only ? 0 : 1);
     }

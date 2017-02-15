@@ -1,21 +1,20 @@
 /**
- * Copyright (c) 2011-2015 libbitcoin developers (see AUTHORS)
+ * Copyright (c) 2011-2017 libbitcoin developers (see AUTHORS)
  *
- * This file is part of libbitcoin-server.
+ * This file is part of libbitcoin.
  *
- * libbitcoin-server is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License with
- * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version. For more information see LICENSE.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <bitcoin/server/services/transaction_service.hpp>
 
@@ -54,11 +53,10 @@ bool transaction_service::start()
     // Subscribe to transaction pool acceptances.
     node_.subscribe_transaction(
         std::bind(&transaction_service::handle_transaction,
-            this, _1, _2, _3));
+            this, _1, _2));
 
     return zmq::worker::start();
 }
-
 
 // No unsubscribe so must be kept in scope until subscriber stop complete.
 bool transaction_service::stop()
@@ -146,7 +144,7 @@ bool transaction_service::unbind(zmq::socket& xpub, zmq::socket& xsub)
 // ----------------------------------------------------------------------------
 
 bool transaction_service::handle_transaction(const code& ec,
-    const chain::point::indexes&, transaction_const_ptr tx)
+    transaction_const_ptr tx)
 {
     if (stopped() || ec == error::service_stopped)
         return false;
@@ -184,9 +182,10 @@ void transaction_service::publish_transaction(transaction_const_ptr tx)
 
     if (ec)
     {
-        LOG_WARNING(LOG_SERVER)
-            << "Failed to connect " << security << " transaction worker: "
-            << ec.message();
+        // TODO: fix socket so that it can detect context stopped.
+        ////LOG_WARNING(LOG_SERVER)
+        ////    << "Failed to connect " << security << " transaction worker: "
+        ////    << ec.message();
         return;
     }
 
