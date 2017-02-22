@@ -251,9 +251,9 @@ void notification_worker::send_address(const route& reply_to, uint32_t id,
 // ----------------------------------------------------------------------------
 
 bool notification_worker::handle_address(const code& ec,
-    const binary& field, uint32_t height, const hash_digest& block_hash,
+    const libbitcoin::binary& field, uint32_t height, const hash_digest& block_hash,
     const transaction& tx, const route& reply_to, uint32_t id,
-    const binary& prefix_filter, sequence_ptr sequence)
+    const libbitcoin::binary& prefix_filter, sequence_ptr sequence)
 {
     if (ec)
     {
@@ -276,7 +276,7 @@ bool notification_worker::handle_address(const code& ec,
 // Subscribe to address and stealth prefix notifications.
 // Each delegate must connect to the appropriate query notification endpoint.
 void notification_worker::subscribe_address(const route& reply_to, uint32_t id,
-    const binary& prefix_filter, bool unsubscribe)
+    const libbitcoin::binary& prefix_filter, bool unsubscribe)
 {
     static const auto error_code = error::channel_stopped;
     const address_key key(reply_to, prefix_filter);
@@ -447,7 +447,7 @@ void notification_worker::notify_transaction(uint32_t height,
 
         if (address)
         {
-            const binary field(address_bits, address.hash());
+            const libbitcoin::binary field(address_bits, address.hash());
             notify_address(field, height, block_hash, tx);
         }
     }
@@ -461,7 +461,7 @@ void notification_worker::notify_transaction(uint32_t height,
 
         if (address)
         {
-            const binary field(address_bits, address.hash());
+            const libbitcoin::binary field(address_bits, address.hash());
             notify_address(field, height, block_hash, tx);
         }
     }
@@ -479,14 +479,14 @@ void notification_worker::notify_transaction(uint32_t height,
         if (payment_output.address() &&
             to_stealth_prefix(prefix, ephemeral_script))
         {
-            const binary field(prefix_bits, to_little_endian(prefix));
+            const libbitcoin::binary field(prefix_bits, to_little_endian(prefix));
             notify_address(field, height, block_hash, tx);
         }
     }
 }
 
 // v3
-void notification_worker::notify_address(const binary& field, uint32_t height,
+void notification_worker::notify_address(const libbitcoin::binary& field, uint32_t height,
     const hash_digest& block_hash, const transaction& tx)
 {
     static const auto code = error::success;

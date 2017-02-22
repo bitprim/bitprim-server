@@ -121,7 +121,7 @@ bool server_node::close()
 
 // Subscribe (or unsubscribe) to address/stealth prefix notifications.
 void server_node::subscribe_address(const route& reply_to, uint32_t id,
-    const binary& prefix_filter, bool unsubscribe)
+    const libbitcoin::binary& prefix_filter, bool unsubscribe)
 {
     if (reply_to.secure)
         secure_notification_worker_

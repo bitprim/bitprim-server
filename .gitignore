@@ -24,3 +24,5 @@ libobelisk.pc
 /src/bitcoin_server
 
 /build
+/.idea
+cmake-build-debug/
