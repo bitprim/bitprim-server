@@ -53,10 +53,10 @@ private:
     void initialize_output();
     void set_minimum_threadpool_size();
 
-#if !defined(WITH_REMOTE_BLOCKCHAIN) && !defined(WITH_REMOTE_DATABASE)
+//#if !defined(WITH_REMOTE_BLOCKCHAIN) && !defined(WITH_REMOTE_DATABASE)
     bool do_initchain();
     bool verify_directory();
-#endif    
+//#endif    
 
     bool run();
 
