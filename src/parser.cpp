@@ -341,6 +341,13 @@ options_metadata parser::load_settings()
         value<uint32_t>(&configured.database.cache_capacity),
         "The maximum number of entries in the unspent outputs cache, defaults to 0."
     )
+#if defined(WITH_REMOTE_DATABASE)    
+    (
+        "database.replier",
+        value<config::endpoint>(&configured.database.replier),
+        "Database-blockchain connection, defaults to 127.0.0.1:5568."
+    )    
+#endif //defined(WITH_REMOTE_DATABASE)    
 
     /* [blockchain] */
     (
@@ -415,6 +422,14 @@ options_metadata parser::load_settings()
         value<bool>(&configured.chain.bip90),
         "Assume bip34, bip65, and bip66 activation if enabled, defaults to true (hard fork)."
     )
+#if defined(WITH_REMOTE_BLOCKCHAIN)
+    (
+        "blockchain.replier",
+        value<config::endpoint>(&configured.chain.replier),
+        "Blockchain Replier connect() endpoint."
+    )
+#endif // defined(WITH_REMOTE_BLOCKCHAIN)
+
 
     /* [node] */
     (
