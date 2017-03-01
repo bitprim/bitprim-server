@@ -380,11 +380,13 @@ options_metadata parser::load_settings()
         value<config::checkpoint::list>(&configured.chain.checkpoints),
         "A hash:height checkpoint, multiple entries allowed."
     )
+#if defined(WITH_REMOTE_BLOCKCHAIN)
     (
         "blockchain.replier",
         value<config::endpoint>(&configured.chain.replier),
         "Blockchain Replier connect() endpoint."
     )
+#endif // defined(WITH_REMOTE_BLOCKCHAIN)
 
     /* [fork] */
     (
@@ -422,13 +424,7 @@ options_metadata parser::load_settings()
         value<bool>(&configured.chain.bip90),
         "Assume bip34, bip65, and bip66 activation if enabled, defaults to true (hard fork)."
     )
-#if defined(WITH_REMOTE_BLOCKCHAIN)
-    (
-        "blockchain.replier",
-        value<config::endpoint>(&configured.chain.replier),
-        "Blockchain Replier connect() endpoint."
-    )
-#endif // defined(WITH_REMOTE_BLOCKCHAIN)
+
 
 
     /* [node] */
