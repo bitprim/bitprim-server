@@ -254,9 +254,9 @@ bool notification_worker::handle_address(const code& ec,
     // const libbitcoin::binary& field, uint32_t height, const hash_digest& block_hash,
     // const transaction& tx, const route& reply_to, uint32_t id,
     // const libbitcoin::binary& prefix_filter, sequence_ptr sequence)
-    const binary& field, uint32_t height, const hash_digest& block_hash,
+    const libbitcoin::binary& field, uint32_t height, const hash_digest& block_hash,
     transaction_const_ptr tx, const route& reply_to, uint32_t id,
-    const binary& prefix_filter, sequence_ptr sequence)
+    const libbitcoin::binary& prefix_filter, sequence_ptr sequence)
 {
     if (ec)
     {
@@ -494,7 +494,7 @@ void notification_worker::notify_transaction(uint32_t height,
 // v3
 // void notification_worker::notify_address(const libbitcoin::binary& field, uint32_t height,
 //     const hash_digest& block_hash, const transaction& tx)
-void notification_worker::notify_address(const binary& field, uint32_t height,
+void notification_worker::notify_address(const libbitcoin::binary& field, uint32_t height,
     const hash_digest& block_hash, transaction_const_ptr tx)
 {
     static const auto code = error::success;

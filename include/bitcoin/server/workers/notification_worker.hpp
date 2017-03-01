@@ -104,7 +104,7 @@ private:
     ////    const hash_digest& block_hash, transaction_const_ptr tx);
 
     // v3
-    void notify_address(const binary& field, uint32_t height,
+    void notify_address(const libbitcoin::binary& field, uint32_t height,
         const hash_digest& block_hash, transaction_const_ptr tx);
     ////void notify_penetration(uint32_t height, const hash_digest& block_hash,
     ////    const hash_digest& tx_hash);
@@ -131,7 +131,7 @@ private:
     ////    const route& reply_to, uint32_t id, const binary& prefix_filter);
     bool handle_address(const code& ec, const binary& field, uint32_t height,
         const hash_digest& block_hash, transaction_const_ptr tx,
-        const route& reply_to, uint32_t id, const binary& prefix_filter,
+        const route& reply_to, uint32_t id, const libbitcoin::binary& prefix_filter,
         sequence_ptr sequence);
 
     const bool secure_;

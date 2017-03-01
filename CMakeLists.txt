@@ -58,6 +58,18 @@ if (NOT TARGET bitprim-protocol)
   find_package(bitprim-protocol 3.0.0 REQUIRED)
 endif()
 
+# Require bitprim-blockchain of at least version 3.0.0 and output ${bitprim_blockchain_CPPFLAGS/LIBS/PKG}.
+#------------------------------------------------------------------------------
+if(WITH_REMOTE_BLOCKCHAIN)
+  if (NOT TARGET bitprim-blockchain-requester)
+    find_package(bitprim-blockchain-requester 3.0.0 REQUIRED)
+  endif()
+else()
+  if (NOT TARGET bitprim-blockchain)
+    find_package(bitprim-blockchain 3.0.0 REQUIRED)
+  endif()
+endif()
+
 # Set flags.
 #==============================================================================
 include(CheckCXXCompilerFlag)
