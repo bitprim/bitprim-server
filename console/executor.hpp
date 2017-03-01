@@ -50,11 +50,14 @@ private:
     void do_help();
     void do_settings();
     void do_version();
-    bool do_initchain();
-
     void initialize_output();
-    bool verify_directory();
     void set_minimum_threadpool_size();
+
+#if !defined(WITH_REMOTE_BLOCKCHAIN) && !defined(WITH_REMOTE_DATABASE)
+    bool do_initchain();
+    bool verify_directory();
+#endif    
+
     bool run();
 
     // Termination state.

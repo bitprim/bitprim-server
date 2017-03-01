@@ -112,6 +112,7 @@ void executor::do_version()
         LIBBITCOIN_VERSION << std::endl;
 }
 
+#if !defined(WITH_REMOTE_BLOCKCHAIN) && !defined(WITH_REMOTE_DATABASE)
 // Emit to the log.
 bool executor::do_initchain()
 {
@@ -124,8 +125,14 @@ bool executor::do_initchain()
     {
         LOG_INFO(LOG_SERVER) << format(BS_INITIALIZING_CHAIN) % directory;
 
+        //TODO: BITPRIM: hardcoded identifiers
         // Unfortunately we are limited to a choice of hardcoded chains.
-        auto testnet = (metadata_.configured.network.identifier == 118034699u);
+#ifdef LITECOIN
+        const auto testnet = (metadata_.configured.network.identifier == 3703030268u); //Litecoin
+#else
+        const auto testnet = (metadata_.configured.network.identifier == 118034699u);  //Bitcoin
+#endif //LITECOIN
+
         const auto genesis = testnet ? block::genesis_testnet() :
             block::genesis_mainnet();
 
@@ -145,6 +152,8 @@ bool executor::do_initchain()
     LOG_ERROR(LOG_SERVER) << format(BS_INITCHAIN_NEW) % directory % ec.message();
     return false;
 }
+
+#endif   // !defined(WITH_REMOTE_BLOCKCHAIN) && !defined(WITH_REMOTE_DATABASE)
 
 // Menu selection.
 // ----------------------------------------------------------------------------
@@ -171,10 +180,12 @@ bool executor::menu()
         return true;
     }
 
+#if !defined(WITH_REMOTE_BLOCKCHAIN) && !defined(WITH_REMOTE_DATABASE)
     if (config.initchain)
     {
         return do_initchain();
     }
+#endif // !defined(WITH_REMOTE_BLOCKCHAIN) && !defined(WITH_REMOTE_DATABASE)    
 
     // There are no command line arguments, just run the server.
     return run();
@@ -189,8 +200,10 @@ bool executor::run()
 
     LOG_INFO(LOG_SERVER) << BS_NODE_STARTING;
 
+#if !defined(WITH_REMOTE_BLOCKCHAIN) && !defined(WITH_REMOTE_DATABASE)
     if (!verify_directory())
         return false;
+#endif // !defined(WITH_REMOTE_BLOCKCHAIN) && !defined(WITH_REMOTE_DATABASE)    
 
     // Ensure all configured services can function.
     set_minimum_threadpool_size();
@@ -308,6 +321,7 @@ void executor::initialize_output()
         LOG_INFO(LOG_SERVER) << format(BS_USING_CONFIG_FILE) % file;
 }
 
+#if !defined(WITH_REMOTE_BLOCKCHAIN) && !defined(WITH_REMOTE_DATABASE)
 // Use missing directory as a sentinel indicating lack of initialization.
 bool executor::verify_directory()
 {
@@ -327,6 +341,7 @@ bool executor::verify_directory()
     LOG_ERROR(LOG_SERVER) << format(BS_INITCHAIN_TRY) % directory % message;
     return false;
 }
+#endif // !defined(WITH_REMOTE_BLOCKCHAIN) && !defined(WITH_REMOTE_DATABASE)
 
 // Increase the configured minimum as required to operate the service.
 void executor::set_minimum_threadpool_size()
