@@ -34,7 +34,9 @@
 #include <bitcoin/server/utility/authenticator.hpp>
 #include <bitcoin/server/workers/notification_worker.hpp>
 
+#ifdef WITH_LOCAL_MINING
 #include <bitcoin/mining/full_mining_node.hpp>
+#endif
 namespace libbitcoin {
 namespace server {
 

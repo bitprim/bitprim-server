@@ -25,9 +25,6 @@ option(WITH_REMOTE_DATABASE "Compile with remote bitprim-database (aka. bitprim-
 # Implement --with-remote-database and declare WITH_REMOTE_DATABASE.
 #------------------------------------------------------------------------------
 option(WITH_LOCAL_MINING "Compile with remote bitprim-mining." ON)
-if (WITH_LOCAL_MINING)
-  add_definitions(-DMINING)
-endif()
 # Implement --with-tests and declare WITH_TESTS.
 #------------------------------------------------------------------------------
 option(WITH_TESTS "Compile with unit tests." ON)
@@ -234,7 +231,11 @@ if (NOT MSVC)
   target_compile_definitions(bitprim-server PUBLIC -DSYSCONFDIR=\"${SYSCONFDIR}\")
 endif()
 
+if (WITH_LOCAL_MINING)
 target_link_libraries(bitprim-server bitprim-node bitprim-protocol bitprim-mining)
+else()
+  target_link_libraries(bitprim-server bitprim-node bitprim-protocol)
+endif()
 
 if (WITH_REMOTE_BLOCKCHAIN)
   target_compile_definitions(bitprim-server PUBLIC -DWITH_REMOTE_BLOCKCHAIN)

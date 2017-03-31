@@ -25,10 +25,9 @@
 #include <bitcoin/server/configuration.hpp>
 #include <bitcoin/server/messages/route.hpp>
 #include <bitcoin/server/workers/query_worker.hpp>
-
+#ifdef WITH_LOCAL_MINING
 #include <boost/utility/in_place_factory.hpp>
-#include <bitcoin/mining/full_mining_node.hpp>
-
+#endif
 namespace libbitcoin {
 namespace server {
 

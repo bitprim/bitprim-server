@@ -50,7 +50,9 @@ public:
 
     /// Settings.
     server::settings server;
+#ifdef WITH_LOCAL_MINING
     mining::settings mining;
+#endif
 };
 
 } // namespace server
