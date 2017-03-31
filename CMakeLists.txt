@@ -22,7 +22,12 @@ option(WITH_REMOTE_BLOCKCHAIN "Compile with remote bitprim-blockchain (aka. bitp
 #------------------------------------------------------------------------------
 option(WITH_REMOTE_DATABASE "Compile with remote bitprim-database (aka. bitprim-database-requester)." ON)
 
-
+# Implement --with-remote-database and declare WITH_REMOTE_DATABASE.
+#------------------------------------------------------------------------------
+option(WITH_LOCAL_MINING "Compile with remote bitprim-mining." ON)
+if (WITH_LOCAL_MINING)
+  add_definitions(-DMINING)
+endif()
 # Implement --with-tests and declare WITH_TESTS.
 #------------------------------------------------------------------------------
 option(WITH_TESTS "Compile with unit tests." ON)
@@ -75,6 +80,15 @@ if(WITH_REMOTE_BLOCKCHAIN)
 else()
   if (NOT TARGET bitprim-blockchain)
     find_package(bitprim-blockchain 3.0.0 REQUIRED)
+  endif()
+endif()
+
+# Require bitprim-mining of at least version 3.0.0 and output ${bitprim_mining_CPPFLAGS/LIBS/PKG}.
+#------------------------------------------------------------------------------
+if (WITH_LOCAL_MINING)
+  if (NOT TARGET bitprim-mining)
+    find_package(bitprim-mining 3.0.0 REQUIRED)
+    add_definitions(-DWITH_LOCAL_MINING)
   endif()
 endif()
 
@@ -220,7 +234,7 @@ if (NOT MSVC)
   target_compile_definitions(bitprim-server PUBLIC -DSYSCONFDIR=\"${SYSCONFDIR}\")
 endif()
 
-target_link_libraries(bitprim-server bitprim-node bitprim-protocol)
+target_link_libraries(bitprim-server bitprim-node bitprim-protocol bitprim-mining)
 
 if (WITH_REMOTE_BLOCKCHAIN)
   target_compile_definitions(bitprim-server PUBLIC -DWITH_REMOTE_BLOCKCHAIN)

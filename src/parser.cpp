@@ -568,7 +568,76 @@ options_metadata parser::load_settings()
         "server.client_address",
         value<config::authority::list>(&configured.server.client_addresses),
         "Allowed client IP address, multiple entries allowed."
-    );
+    )
+
+#ifdef WITH_LOCAL_MINING
+    /* [mining] */
+    (
+            "mining.cores",
+            value<uint32_t>(&configured.mining.cores),
+            //"The number of threads in the mining threadpool, defaults to 50."
+            "The number of cores dedicated to ????? validation, defaults to 0 (physical cores)."
+    )
+
+    (
+            "mining.block_timeout_seconds",
+            value<uint32_t>(&configured.mining.block_timeout_seconds),
+            "The time limit for block receipt during initial block download, defaults to 5."
+    )
+    (
+            "mining.initial_connections",
+            value<uint32_t>(&configured.mining.initial_connections),
+            "The maximum number of connections for initial block download, defaults to 8."
+    )
+    (
+            "mining.transaction_pool_refresh",
+            value<bool>(&configured.mining.transaction_pool_refresh),
+            "Refresh the transaction pool on reorganization and channel start, defaults to true."
+    )
+    (
+            "mining.use_testnet_rules",
+            value<bool>(&configured.mining.use_testnet_rules),
+            "Use testnet rules for determination of work required, defaults to false."
+    )
+    (
+            "mining.rpc_port",
+            value<uint32_t>(&configured.mining.rpc_port),
+            "TCP port for the HTTP-JSON-RPC connection, default to 8332 (8332 mainnet, 9332 testnet)."
+    )
+
+    /* [server] */
+    (
+            "server.url",
+            value<bc::config::endpoint>(&configured.mining.server_url)->default_value({ "tcp://127.0.0.1:9091" }),
+            "The URL of the Libbitcoin/Obelisk server."
+    )
+    (
+            "server.socks_proxy",
+            value<bc::config::authority>(&configured.mining.server_socks_proxy)->default_value({ "0.0.0.0:0" }),
+            "The address of a SOCKS5 proxy to use, defaults to none."
+    )
+    (
+            "server.connect_retries",
+            value<mining::config::byte>(&configured.mining.server_connect_retries)->default_value(0),
+            "The number of times to retry contacting a server, defaults to 0."
+    )
+    (
+            "server.connect_timeout_seconds",
+            value<uint16_t>(&configured.mining.server_connect_timeout_seconds)->default_value(5),
+            "The time limit for connection establishment, defaults to 5."
+    )
+    (
+            "server.server_public_key",
+            value<bc::config::sodium>(&configured.mining.server_server_public_key),
+            "The Z85-encoded public key of the server."
+    )
+    (
+            "server.client_private_key",
+            value<bc::config::sodium>(&configured.mining.server_client_private_key),
+            "The Z85-encoded private key of the client."
+    )
+#endif
+    ;
 
     return description;
 }

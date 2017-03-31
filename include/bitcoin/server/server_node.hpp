@@ -34,6 +34,7 @@
 #include <bitcoin/server/utility/authenticator.hpp>
 #include <bitcoin/server/workers/notification_worker.hpp>
 
+#include <bitcoin/mining/full_mining_node.hpp>
 namespace libbitcoin {
 namespace server {
 
@@ -116,6 +117,10 @@ private:
     transaction_service public_transaction_service_;
     notification_worker secure_notification_worker_;
     notification_worker public_notification_worker_;
+
+#ifdef WITH_LOCAL_MINING
+    std::shared_ptr<mining::full_mining_node> mining_node_;
+#endif
 };
 
 } // namespace server

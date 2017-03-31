@@ -26,6 +26,9 @@
 #include <bitcoin/server/messages/route.hpp>
 #include <bitcoin/server/workers/query_worker.hpp>
 
+#include <boost/utility/in_place_factory.hpp>
+#include <bitcoin/mining/full_mining_node.hpp>
+
 namespace libbitcoin {
 namespace server {
 
@@ -80,6 +83,13 @@ void server_node::run(result_handler handler)
     full_node::run(
         std::bind(&server_node::handle_running,
             this, _1, handler));
+
+#ifdef WITH_LOCAL_MINING
+    mining_node_ = std::make_shared<mining::full_mining_node>(configuration_.mining, chain_);
+    //mining_node_ = boost::in_place(configuration_.mining, chain_);
+    mining_node_->start(handler);
+    mining_node_->run(handler);
+#endif
 }
 
 void server_node::handle_running(const code& ec, result_handler handler)
@@ -106,12 +116,22 @@ void server_node::handle_running(const code& ec, result_handler handler)
 bool server_node::stop()
 {
     // Suspend new work last so we can use work to clear subscribers.
+#ifdef WITH_LOCAL_MINING
+    if (!mining_node_->stop()){
+        std::cout << "mining node STOP error";
+    }
+#endif
     return authenticator_.stop() && full_node::stop();
 }
 
 // This must be called from the thread that constructed this class (see join).
 bool server_node::close()
 {
+#ifdef WITH_LOCAL_MINING
+    if (!mining_node_->close()){
+        std::cout << "mining node CLOSE error";
+    }
+#endif
     // Invoke own stop to signal work suspension, then close node and join.
     return server_node::stop() && full_node::close();
 }

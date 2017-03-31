@@ -23,6 +23,9 @@
 #include <bitcoin/server/define.hpp>
 #include <bitcoin/server/settings.hpp>
 
+#ifdef WITH_LOCAL_MINING
+#include <bitcoin/mining/settings.hpp>
+#endif
 namespace libbitcoin {
 namespace server {
 
@@ -47,6 +50,7 @@ public:
 
     /// Settings.
     server::settings server;
+    mining::settings mining;
 };
 
 } // namespace server
