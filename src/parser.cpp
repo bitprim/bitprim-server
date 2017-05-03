@@ -604,6 +604,26 @@ options_metadata parser::load_settings()
             value<uint32_t>(&configured.mining.rpc_port),
             "TCP port for the HTTP-JSON-RPC connection, default to 8332 (8332 mainnet, 9332 testnet)."
     )
+    (
+            "mining.real_consensus_enabled",
+            value<bool>(&configured.mining.real_consensus_enabled),
+            "Enable real consensus mining."
+    )
+    (
+            "mining.real_consensus_endpoint",
+            value<bc::config::endpoint>(&configured.mining.real_consensus_endpoint)->default_value({ "localhost:19999" }),
+            "The real consensus client endpoint."
+    )
+    (
+            "mining.real_consensus_user",
+            value<std::string>(&configured.mining.real_consensus_user),
+            "The real consensus client user."
+    )
+    (
+            "mining.real_consensus_pass",
+            value<std::string>(&configured.mining.real_consensus_pass),
+            "The real consensus client authorization pass."
+    )
 
     /* [server] */
     (

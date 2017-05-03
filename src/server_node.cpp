@@ -117,7 +117,7 @@ bool server_node::stop()
     // Suspend new work last so we can use work to clear subscribers.
 #ifdef WITH_LOCAL_MINING
     if (!mining_node_->stop()){
-        std::cout << "mining node STOP error";
+       LOG_ERROR(LOG_SERVER) << "Failed to stop mining node.;" << std::endl;
     }
 #endif
     return authenticator_.stop() && full_node::stop();
@@ -128,7 +128,7 @@ bool server_node::close()
 {
 #ifdef WITH_LOCAL_MINING
     if (!mining_node_->close()){
-        std::cout << "mining node CLOSE error";
+       LOG_ERROR(LOG_SERVER) << "Failed to close mining node.;" << std::endl;
     }
 #endif
     // Invoke own stop to signal work suspension, then close node and join.
