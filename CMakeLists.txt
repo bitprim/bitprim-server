@@ -25,6 +25,13 @@ option(WITH_REMOTE_DATABASE "Compile with remote bitprim-database (aka. bitprim-
 # Implement --with-remote-database and declare WITH_REMOTE_DATABASE.
 #------------------------------------------------------------------------------
 option(WITH_LOCAL_MINING "Compile with remote bitprim-mining." ON)
+
+# EXTENSION BLOCK NETWORK
+option(WITH_EXTBLK "Compile with Extension blocks support." OFF)
+if (WITH_EXTBLK)
+  add_definitions(-DWITH_EXTBLK)
+endif()
+
 # Implement --with-tests and declare WITH_TESTS.
 #------------------------------------------------------------------------------
 option(WITH_TESTS "Compile with unit tests." ON)
