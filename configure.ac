@@ -15,6 +15,7 @@ AC_PREREQ([2.65])
 # Process command-line arguments and perform initialization and verification.
 AC_INIT([libbitcoin-server], [3.0.0], [eric@voskuil.org])
 
+
 # Do compilation tests.
 AC_LANG(C++)
 
@@ -156,6 +157,7 @@ AS_CASE([${bash_completiondir}], [yes],
      AC_MSG_NOTICE([bash_completion_CPPFLAGS : ${bash_completion_CPPFLAGS}])
      AC_MSG_NOTICE([bash_completion_LIBS : ${bash_completion_LIBS}])],
     [AC_SUBST([bash_completion_PKG], [])])
+
 
 # Require bitcoin-node of at least version 3.0.0 and output ${bitcoin_node_CPPFLAGS/LIBS/PKG}.
 #------------------------------------------------------------------------------

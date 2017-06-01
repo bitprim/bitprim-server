@@ -20,6 +20,7 @@
 #define LIBBITCOIN_SERVER_CONFIGURATION_HPP
 
 #include <bitcoin/node.hpp>
+#include <bitcoin/protocol.hpp>
 #include <bitcoin/server/define.hpp>
 #include <bitcoin/server/settings.hpp>
 
@@ -45,14 +46,15 @@ class BCS_API configuration
   : public node::configuration
 {
 public:
-    configuration(bc::config::settings context);
-    configuration(const configuration& other);
+    configuration(config::settings context);
 
     /// Settings.
-    server::settings server;
 #ifdef WITH_LOCAL_MINING
     mining::settings mining;
 #endif
+    bc::server::settings server;
+    bc::protocol::settings protocol;
+
 };
 
 } // namespace server

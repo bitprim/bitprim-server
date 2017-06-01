@@ -6,6 +6,7 @@
 
 Make sure you have installed [bitprim-core](https://github.com/bitprim/bitprim-core), [bitprim-database](https://github.com/bitprim/bitprim-database), [bitprim-blockchain](https://github.com/bitprim/bitprim-blockchain), [bitprim-consensus](https://github.com/bitprim/bitprim-consensus) (optional), [bitprim-network](https://github.com/bitprim/bitprim-network), [bitprim-node](https://github.com/bitprim/bitprim-node) and [bitprim-protocol](https://github.com/bitprim/bitprim-protocol) beforehand according to its build instructions.
 
+
 ```
 $ git clone https://github.com/bitprim/bitprim-server.git
 $ cd bitprim-server
