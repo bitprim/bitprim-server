@@ -224,8 +224,8 @@ add_library(bitprim-server ${MODE}
   #src/utility/authenticator.cpp
   #src/utility/fetch_helpers.cpp
   src/workers/notification_worker.cpp
-  src/workers/query_worker.cpp)
-  src/workers/authenticator.cpp
+  src/workers/query_worker.cpp
+  src/workers/authenticator.cpp)
 target_include_directories(bitprim-server PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
