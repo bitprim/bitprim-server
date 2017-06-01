@@ -56,9 +56,7 @@ private:
 
 //#if !defined(WITH_REMOTE_BLOCKCHAIN) && !defined(WITH_REMOTE_DATABASE)
     bool do_initchain();
-    bool verify_directory();
 //#endif    
-
 
     bool verify_directory();
 
