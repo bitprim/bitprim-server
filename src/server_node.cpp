@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <utility>
 #include <bitcoin/node.hpp>
 #include <bitcoin/server/configuration.hpp>
 #include <bitcoin/server/messages/route.hpp>
@@ -62,7 +63,12 @@ server_node::~server_node()
 // Properties.
 // ----------------------------------------------------------------------------
 
-const settings& server_node::server_settings() const
+const bc::protocol::settings& server_node::protocol_settings() const
+{
+    return configuration_.protocol;
+}
+
+const bc::server::settings& server_node::server_settings() const
 {
     return configuration_.server;
 }
@@ -99,6 +105,15 @@ void server_node::handle_running(const code& ec, result_handler handler)
         return;
     }
 
+    // BUGBUG: start/stop race condition.
+    // This can invoke just after close calls stop.
+    // The stop handler is already stopped but the authenticator context gets
+    // started, allowing services to stop. The registration of services with
+    // the stop handler invokes the registered handlers immediately, invoking
+    // stop o nthe services. The services are running and don't stop...
+    // notification_worker, query_service and authenticator service.
+    // The authenticator is already stopped (before it started) so there will
+    // be no context stop to stop the services, specifically the relays.
     if (!start_services())
     {
         handler(error::operation_failed);
@@ -138,29 +153,30 @@ bool server_node::close()
 // Notification.
 // ----------------------------------------------------------------------------
 
+//PREMERGE
+//void server_node::subscribe_address(const route& reply_to, uint32_t id,
+//    const libbitcoin::binary& prefix_filter, bool unsubscribe)
+
 // Subscribe (or unsubscribe) to address/stealth prefix notifications.
-void server_node::subscribe_address(const route& reply_to, uint32_t id,
-    const libbitcoin::binary& prefix_filter, bool unsubscribe)
+code server_node::subscribe_address(const message& request,
+    short_hash&& address_hash, bool unsubscribe)
 {
-    if (reply_to.secure)
-        secure_notification_worker_
-            .subscribe_address(reply_to, id, prefix_filter, unsubscribe);
-    else
-        public_notification_worker_
-            .subscribe_address(reply_to, id, prefix_filter, unsubscribe);
+    return request.secure() ?
+        secure_notification_worker_.subscribe_address(request,
+            std::move(address_hash), unsubscribe) :
+        public_notification_worker_.subscribe_address(request,
+            std::move(address_hash), unsubscribe);
 }
 
-////// Subscribe to transaction penetration notifications.
-////void server_node::subscribe_penetration(const route& reply_to, uint32_t id,
-////    const hash_digest& tx_hash)
-////{
-////    if (reply_to.secure)
-////        secure_notification_worker_
-////            .subscribe_penetration(reply_to, id, tx_hash);
-////    else
-////        public_notification_worker_
-////            .subscribe_penetration(reply_to, id, tx_hash);
-////}
+code server_node::subscribe_stealth(const message& request,
+    binary&& prefix_filter, bool unsubscribe)
+{
+    return request.secure() ?
+        secure_notification_worker_.subscribe_stealth(request,
+            std::move(prefix_filter), unsubscribe) :
+        public_notification_worker_.subscribe_stealth(request,
+            std::move(prefix_filter), unsubscribe);
+}
 
 // Services.
 // ----------------------------------------------------------------------------
@@ -180,7 +196,7 @@ bool server_node::start_authenticator()
     // Subscriptions require the query service.
     if ((!settings.server_private_key && settings.secure_only) ||
         ((settings.query_workers == 0) &&
-        (settings.heartbeat_interval_seconds == 0) &&
+        (settings.heartbeat_service_seconds == 0) &&
         (!settings.block_service_enabled) &&
         (!settings.transaction_service_enabled)))
         return true;
@@ -197,15 +213,15 @@ bool server_node::start_query_services()
         return true;
 
     // Start secure service, query workers and notification workers if enabled.
-    if (settings.server_private_key && (!secure_query_service_.start() ||
-        (settings.subscription_limit > 0 && !secure_notification_worker_.start()) ||
-        !start_query_workers(true)))
+    if (settings.server_private_key &&
+        (!secure_query_service_.start() || !start_query_workers(true) ||
+        (settings.subscription_limit > 0 && !start_notification_workers(true))))
             return false;
 
     // Start public service, query workers and notification workers if enabled.
-    if (!settings.secure_only && (!public_query_service_.start() ||
-        (settings.subscription_limit > 0 && !public_notification_worker_.start()) ||
-        !start_query_workers(false)))
+    if (!settings.secure_only && 
+        (!public_query_service_.start() || !start_query_workers(false) ||
+        (settings.subscription_limit > 0 && !start_notification_workers(false))))
             return false;
 
     return true;
@@ -215,7 +231,7 @@ bool server_node::start_heartbeat_services()
 {
     const auto& settings = configuration_.server;
 
-    if (settings.heartbeat_interval_seconds == 0)
+    if (settings.heartbeat_service_seconds == 0)
         return true;
 
     // Start secure service if enabled.
@@ -273,76 +289,49 @@ bool server_node::start_query_workers(bool secure)
 
     for (auto count = 0; count < settings.query_workers; ++count)
     {
-        auto worker = std::make_shared<query_worker>(authenticator_,
+        const auto worker = std::make_shared<query_worker>(authenticator_,
             server, secure);
 
         if (!worker->start())
             return false;
 
+        // Workers register with stop handler just to keep them in scope.
         subscribe_stop([=](const code&) { worker->stop(); });
     }
 
     return true;
 }
 
-// static
-uint32_t server_node::threads_required(const configuration& configuration)
+// Called from start_query_services.
+bool server_node::start_notification_workers(bool secure)
 {
-    const auto& settings = configuration.server;
+    auto& server = *this;
+    const auto& settings = configuration_.server;
 
-    // The network/node requires a minimum of one thread.
-    uint32_t required = 1;
-
-    if (settings.query_workers > 0)
+    if (secure)
     {
-        if (settings.server_private_key)
+        if (!secure_notification_worker_.start())
+            return false;
+
+        // Because the notification worker holds closures must stop early.
+        subscribe_stop([=](const code&)
         {
-            // Secure query service.
-            ++required;
+            secure_notification_worker_.stop();
+        });
+    }
+    else
+    {
+        if (!public_notification_worker_.start())
+            return false;
 
-            // Secure query worker.
-            required += settings.query_workers;
-
-            // Secure notification worker.
-            required += (settings.subscription_limit > 0 ? 1 : 0);
-        }
-
-        if (!settings.secure_only)
+        // Because the notification worker holds closures must stop early.
+        subscribe_stop([=](const code&)
         {
-            // Public query service.
-            ++required;
-
-            // Public query worker.
-            required += settings.query_workers;
-
-            // Public notification worker.
-            required += (settings.subscription_limit > 0 ? 1 : 0);
-        }
+            public_notification_worker_.stop();
+        });
     }
 
-    if (settings.heartbeat_interval_seconds > 0)
-    {
-        // Secure and/or public heartbeat service.
-        required += (settings.server_private_key ? 1 : 0);
-        required += (settings.secure_only ? 0 : 1);
-    }
-
-    if (settings.block_service_enabled)
-    {
-        // Secure and/or block publish service.
-        required += (settings.server_private_key ? 1 : 0);
-        required += (settings.secure_only ? 0 : 1);
-    }
-
-    if (settings.transaction_service_enabled)
-    {
-        // Secure and/or transaction publish service.
-        required += (settings.server_private_key ? 1 : 0);
-        required += (settings.secure_only ? 0 : 1);
-    }
-
-    // If any services are enabled increment for the authenticator.
-    return required == 1 ? required : required + 1;
+    return true;
 }
 
 } // namespace server

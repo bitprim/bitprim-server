@@ -19,8 +19,10 @@
 #ifndef LIBBITCOIN_SERVER_BLOCK_SERVICE_HPP
 #define LIBBITCOIN_SERVER_BLOCK_SERVICE_HPP
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <string>
 #include <bitcoin/protocol.hpp>
 #include <bitcoin/server/define.hpp>
 #include <bitcoin/server/settings.hpp>
@@ -38,19 +40,12 @@ class BCS_API block_service
 public:
     typedef std::shared_ptr<block_service> ptr;
 
-    /// The fixed inprocess worker endpoints.
-    static const config::endpoint public_worker;
-    static const config::endpoint secure_worker;
-
     /// Construct a block service.
     block_service(bc::protocol::zmq::authenticator& authenticator,
         server_node& node, bool secure);
 
     /// Start the service.
     bool start() override;
-
-    /// Stop the service.
-    bool stop() override;
 
 protected:
     typedef bc::protocol::zmq::socket socket;
@@ -63,21 +58,27 @@ protected:
 
 private:
     bool handle_reorganization(const code& ec, size_t fork_height,
-        block_const_ptr_list_const_ptr new_blocks,
-        block_const_ptr_list_const_ptr old_blocks);
+        block_const_ptr_list_const_ptr incoming,
+        block_const_ptr_list_const_ptr outgoing);
 
     void publish_blocks(uint32_t fork_height,
         block_const_ptr_list_const_ptr blocks);
-    void publish_block(socket& publisher, uint32_t height,
+    void publish_block(socket& publisher, size_t height,
         block_const_ptr block);
 
-    const bool secure_;
-    const bool verbose_;
-    const server::settings& settings_;
-
     // These are thread safe.
+    const bool secure_;
+    const std::string security_;
+    const bc::server::settings& settings_;
+    const bc::protocol::settings& external_;
+    const bc::protocol::settings internal_;
+    const config::endpoint service_;
+    const config::endpoint worker_;
     bc::protocol::zmq::authenticator& authenticator_;
     server_node& node_;
+
+    // This is protected by reorganization non-concurrency.
+    uint16_t sequence_;
 };
 
 } // namespace server

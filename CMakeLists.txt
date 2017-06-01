@@ -203,25 +203,29 @@ if (ENABLE_SHARED)
 endif()
 
 add_library(bitprim-server ${MODE}
-  src/address_key.cpp
+  #src/address_key.cpp
   src/configuration.cpp
   src/parser.cpp
   src/server_node.cpp
   src/settings.cpp
-  src/interface/address.cpp
+  #src/interface/address.cpp
   src/interface/blockchain.cpp
-  src/interface/protocol.cpp
+  src/interface/subscribe.cpp
+  src/interface/unsubscribe.cpp
+  #src/interface/protocol.cpp
   src/interface/transaction_pool.cpp
   src/messages/message.cpp
   src/messages/route.cpp
+  src/messages/subscription.cpp
   src/services/block_service.cpp
   src/services/heartbeat_service.cpp
   src/services/query_service.cpp
   src/services/transaction_service.cpp
-  src/utility/authenticator.cpp
-  src/utility/fetch_helpers.cpp
+  #src/utility/authenticator.cpp
+  #src/utility/fetch_helpers.cpp
   src/workers/notification_worker.cpp
   src/workers/query_worker.cpp)
+  src/workers/authenticator.cpp
 target_include_directories(bitprim-server PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -323,23 +327,27 @@ set(_bitprim_headers
   bitcoin/server/settings.hpp
   bitcoin/server/version.hpp
   # include_bitcoin_server_interface_HEADERS =
-  bitcoin/server/interface/address.hpp
+#  bitcoin/server/interface/address.hpp
   bitcoin/server/interface/blockchain.hpp
-  bitcoin/server/interface/protocol.hpp
+  bitcoin/server/interface/subscribe.hpp
+  bitcoin/server/interface/unsubscribe.hpp
+#  bitcoin/server/interface/protocol.hpp
   bitcoin/server/interface/transaction_pool.hpp
   # include_bitcoin_server_messages_HEADERS =
   bitcoin/server/messages/message.hpp
   bitcoin/server/messages/route.hpp
+  bitcoin/server/messages/subscription.hpp
   # include_bitcoin_server_services_HEADERS =
   bitcoin/server/services/block_service.hpp
   bitcoin/server/services/heartbeat_service.hpp
   bitcoin/server/services/query_service.hpp
   bitcoin/server/services/transaction_service.hpp
   # include_bitcoin_server_utility_HEADERS =
-  bitcoin/server/utility/address_key.hpp
-  bitcoin/server/utility/authenticator.hpp
-  bitcoin/server/utility/fetch_helpers.hpp
+  #bitcoin/server/utility/address_key.hpp
+  #bitcoin/server/utility/authenticator.hpp
+  #bitcoin/server/utility/fetch_helpers.hpp
   # include_bitcoin_server_workers_HEADERS =
+  bitcoin/server/workers/authenticator.hpp
   bitcoin/server/workers/notification_worker.hpp
   bitcoin/server/workers/query_worker.hpp)
 foreach (_header ${_bitprim_headers})
