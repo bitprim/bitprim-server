@@ -120,6 +120,7 @@ private:
 
 #ifdef WITH_LOCAL_MINING
     std::shared_ptr<mining::full_mining_node> mining_node_;
+    bool mining_running_;
 #endif
 };
 

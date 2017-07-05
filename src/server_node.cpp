@@ -39,6 +39,7 @@ using namespace bc::protocol;
 
 server_node::server_node(const configuration& configuration)
   : full_node(configuration),
+    mining_running_(false),
     configuration_(configuration),
     authenticator_(*this),
     secure_query_service_(authenticator_, *this, true),
@@ -94,6 +95,7 @@ void server_node::run(result_handler handler)
     //mining_node_ = boost::in_place(configuration_.mining, chain_);
     mining_node_->start(handler);
     mining_node_->run(handler);
+    mining_running_ = true;
 #endif
 }
 
@@ -131,9 +133,8 @@ bool server_node::stop()
 {
     // Suspend new work last so we can use work to clear subscribers.
 #ifdef WITH_LOCAL_MINING
-    if (!mining_node_->stop()){
+    if ((mining_running_) && (!mining_node_->stop()))
        LOG_ERROR(LOG_SERVER) << "Failed to stop mining node.;" << std::endl;
-    }
 #endif
     return authenticator_.stop() && full_node::stop();
 }
@@ -142,11 +143,12 @@ bool server_node::stop()
 bool server_node::close()
 {
 #ifdef WITH_LOCAL_MINING
-    if (!mining_node_->close()){
+    if ((mining_running_) && (!mining_node_->close())){
        LOG_ERROR(LOG_SERVER) << "Failed to close mining node.;" << std::endl;
     }
 #endif
-    // Invoke own stop to signal work suspension, then close node and join.
+    mining_running_=false;
+    // Invoke own stop to signal work suspension, then close node and join. 
     return server_node::stop() && full_node::close();
 }
 
